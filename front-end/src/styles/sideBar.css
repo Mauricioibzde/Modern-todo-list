@@ -1,0 +1,108 @@
+.sidebar {
+    position: absolute;
+    display: none;
+  width: 260px;
+  background: linear-gradient(180deg, #0b1220, #0f1b2d);
+  color: #cbd5e1;
+  flex-direction: column;
+  padding: 16px;
+}
+
+/* App header */
+.app {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.logo {
+  width: 32px;
+  height: 32px;
+  background: #01275c77;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Menu */
+.menu {
+  flex: 1;
+}
+
+.item {
+    width: 100%;
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: start;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 15px;
+  margin-bottom: 4px;
+  position: relative;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.item.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin: 12px 0;
+}
+
+/* Notification dot */
+.message .dot {
+  width: 8px;
+  height: 8px;
+  background: #6366f1;
+  border-radius: 50%;
+  position: absolute;
+  left: 26px;
+  top: 12px;
+}
+
+/* Account */
+.account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.dot {
+
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #6366f1;
+    font-size: 12px;
+    text-align: center;
+    position: relative;
+    justify-self: end;
+
+    & p {
+        position: absolute;
+        bottom: 1px;
+
+    }
+}

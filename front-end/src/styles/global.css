@@ -1,0 +1,27 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+ 
+     background: linear-gradient(180deg, #0b1220, #0f1b2d);
+     height: 100vh;
+}
+
+span {
+    display: flex;
+    justify-content: center;
+    & svg {
+     width: 20px;
+     height: 20px;
+   
+  }
+}
+
+main {
+
+
+}
