@@ -10,6 +10,15 @@
     }
 }
 
+li {
+    box-shadow: 2px 0 0 0 var(--color-primary);
+}
+
+.list-tasks-ul {
+    background-color: var(--list-task-background);
+    border-radius: 1rem;
+}
+
 .tasks-container {
 
     

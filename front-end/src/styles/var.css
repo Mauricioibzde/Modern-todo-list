@@ -38,4 +38,6 @@
     --hover-overlay-light: rgba(255, 255, 255, 0.06);
     --hover-overlay-medium: rgba(255, 255, 255, 0.12);
     --focus-overlay-primary: rgba(99, 102, 241, 0.1); 
+
+    --list-task-background: #3636360d;    /* Task item background */
 }

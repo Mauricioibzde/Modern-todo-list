@@ -135,4 +135,40 @@
     section {
         padding-block: 2rem;
     }
+
+    .metric-card {
+        width: 5rem;
+          padding: .3rem;
+
+          & h3 {
+            font-size: .7rem;
+          }
+
+          & div {
+            font-size: .8rem!important;
+          }
+    }
+
+    .insights-row {
+     display: flex;
+     justify-content: center;
+}
+
+
+.insight-item {
+    width: 100%;
+
+}
+
+.chart-container {
+    width: 100%;
+}
+
+.list-tasks-ul {
+
+    margin-top: 10rem;
+    max-height: 480px;
+    overflow-y: auto;
+}
+
 }
