@@ -1,0 +1,85 @@
+.custom-category {
+    position: relative;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.select-selected {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 1.25rem;
+    font-size: 1.1rem;
+    border: 1px solid var(--border-dim);
+    cursor: pointer;
+    user-select: none;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.select-selected:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--text-disabled);
+}
+
+.select-selected.select-arrow-active {
+    background-color: var(--bg-secondary);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px var(--focus-overlay-primary);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Style the arrow inside the select element: */
+.select-selected:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-color: var(--text-primary) transparent transparent transparent;
+    margin-left: 10px;
+    transform: translateY(3px);
+}
+
+/* Point the arrow upwards when the select box is open (active): */
+.select-selected.select-arrow-active:after {
+    border-color: transparent transparent var(--text-primary) transparent;
+    transform: translateY(-3px);
+}
+
+/* Style items (options): */
+.select-items {
+    position: absolute;
+    background-color: var(--bg-main);
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    border: 1px solid var(--border-dim);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+}
+
+.select-items div {
+    color: var(--text-primary);
+    padding: 10px 16px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.select-items div:last-child {
+    border-bottom: none;
+}
+
+/* Hide the items when the select box is closed: */
+.select-hide {
+    display: none;
+}
+
+.select-items div:hover, .same-as-selected {
+    background-color: var(--hover-highlight);
+}

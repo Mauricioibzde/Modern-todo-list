@@ -1,0 +1,184 @@
+.list-tasks {
+   background: var(--bg-gradient-main);
+                border-radius: .3rem;
+    height: 100%;
+    text-align: center;
+    color: var(--text-primary);
+
+    h1 {
+        margin-bottom: 2rem;
+    }
+}
+
+.tasks-container {
+
+    
+    .no-tasks-message {
+        display: none; /* Default hidden, logic will toggle block */
+        padding: 2rem;
+        color: var(--text-muted);
+        font-style: italic;
+        margin-top: 4rem;
+    }
+
+    /* Show when explicitly active or logic based */
+    .no-tasks-message.active {
+        display: block;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 1rem;
+        
+
+        li {
+            max-width: 600px;
+            margin: 0 auto 1rem auto;
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
+            display: grid;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-dim);
+            transition: all 0.3s ease;
+            background-color: transparent;
+            background-color: var(--bg-gradient-end);
+
+            
+            &.focused {
+                background: var(--focus-overlay-primary); 
+                border-radius: 0.5rem;
+                border-bottom-color: transparent; 
+                box-shadow: inset 2px 0 0 0 var(--color-primary); 
+            }
+
+        
+
+            & .task-header {
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                justify-content: center;
+                align-items: center;
+                gap: 0.5rem;
+                cursor: pointer;
+
+                input[type="checkbox"] {
+                    width: 16px;
+                    height: 16px;
+                }
+
+                span {
+                    font-size: 1.2rem;
+                    flex-grow: 1;
+                    text-align: left;
+                    justify-self: flex-start;
+                    color: var(--text-muted);
+                }
+            }
+
+        
+
+            .description {
+                /* Hidden state */
+                display: block;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                padding: 0 1rem; /* Horizontal padding kept 0 to avoid width issues, handled in expanded */
+                padding: 0;
+                border: none;
+                margin-top: 0;
+                
+                text-align: left;
+                background: var(--bg-gradient-main);
+                border-radius: .3rem;
+                color: var(--text-secondary);
+                
+                transition: all 0.3s ease-in-out;
+
+                span {
+                    font-size: 1rem;
+                    color: var(--text-muted);
+                    
+                }
+            }
+
+            .description.expanded {
+                /* active state */
+                max-height: 500px; /* Large enough to fit content */
+                opacity: 1;
+                padding: 1rem;
+                border: solid var(--border-dim) 1px;
+                margin-top: 1rem; /* Simulate gap */
+            }
+
+
+            & .controls {
+                /* Hidden state */
+                display: flex;
+                flex-wrap: wrap; /* Ensure buttons wrap if needed */
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                margin-top: 0;
+                
+                gap: 0.5rem;
+                transition: all 0.3s ease-in-out;
+
+                .edit-button,
+                .delete-button {
+                    background-color: var(--color-primary);
+                    border: none;
+                    color: var(--text-primary);
+                    cursor: pointer;
+                    border-radius: 4px;
+                    font-size: 1rem;
+                    padding: 0.5rem 1rem; /* Added padding for better click area */
+                    transition: transform 0.2s ease;
+
+                    &:hover {
+                        transform: scale(1.05);
+                    }
+                }
+
+                .delete-button {
+                    background-color: var(--color-danger);
+                }
+            }
+
+            & .controls.expanded {
+                /* Active state */
+                max-height: 60px; /* Space for buttons */
+                opacity: 1;
+                margin-top: 1rem; /* Simulate gap */
+                padding-bottom: 0.2rem; /* precise tuning */
+            }
+        }
+
+        li:hover {
+            background: var(--hover-overlay-medium);
+            transition: background-color 0.3s ease;
+
+    }
+
+    li:focus {
+        background: var(--hover-overlay-medium);
+        outline: none;
+
+}
+
+}
+
+.input-checkbox {
+    width: 16px;
+    height: 16px;   
+
+
+}
+
+.input-checkbox:checked ~ .name-task,
+.input-checkbox:checked ~ .date-task {
+    text-decoration: line-through;
+    color: #6b7280;
+}
+
+}

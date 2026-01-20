@@ -2,16 +2,24 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-primary);
 }
 
 body {
  
-     background: linear-gradient(180deg, #0b1220, #0f1b2d);
+
      height: 100vh;
+     overflow-y: hidden;
 }
 
-span {
+h1 {
+  font-weight: 300;
+  font-size: 1.5rem;
+}
+
+
+
+span  {
     display: flex;
     justify-content: center;
     & svg {
@@ -21,7 +29,52 @@ span {
   }
 }
 
+h4 {
+   display: grid;
+   justify-content: center;
+   align-items: center;
+    & svg {
+   margin: auto;
+     width: 40px;
+     height: 40px;
+     margin-bottom: 1rem;
+   
+   
+  }
+}
+
+
 main {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  height: 100dvh;
+ 
+}
 
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4rem;
+     background: linear-gradient(180deg, #0b1220, #0f1b2d);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
 
+section {
+    flex: 1;
+    height: 100%;
+    padding: 6rem 2rem 2rem 2rem;
+    overflow-y: auto;
+        background-color: var(--bg-gradient-end);
+    
+}
+
+.hidden {
+    display: none !important;
 }

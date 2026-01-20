@@ -1,0 +1,121 @@
+.search {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--bg-gradient-start);
+}
+
+.search-header h1 {
+ margin-bottom: 2rem;
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.search-wrapper {
+    width: 100%;
+    margin: 0 auto 3rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.search-bar {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+}
+
+#search-input {
+    width: 100%;
+    padding: 1.25rem 1.25rem 1.25rem 3.5rem;
+    font-size: 1.1rem;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-dim);
+    color: var(--text-primary);
+    border-radius: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    margin-bottom: 0;
+}
+
+#search-input:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--text-disabled);
+}
+
+#search-input:focus {
+    background-color: var(--bg-secondary);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px var(--focus-overlay-primary);
+}
+
+#search-input:focus ~ .search-icon {
+    color: var(--color-primary);
+}
+
+/* Filter Chips */
+.filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.filter-chip {
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-dim);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-chip:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-input);
+    transform: translateY(-1px);
+}
+
+.filter-chip.active {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.4);
+}
+
+.search-results-ul {
+    padding: 0;
+    list-style: none;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.search-results .no-tasks-found {
+    text-align: center;
+    color: var(--text-muted);
+    margin-top: 2rem;
+    font-style: italic;
+}
+}
+
+.search {
+     background-color: var(--bg-gradient-start);
+}
