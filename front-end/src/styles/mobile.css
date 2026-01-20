@@ -108,13 +108,14 @@
 
     /* --- Add Task Form --- */
     .add-task {
-        padding: 1rem;
+      
     }
     
     .add-task input, 
     .add-task textarea, 
     .add-task select {
         font-size: 16px; /* Prevent IOS zoom */
+        
     }
     
     .custom-category .select-selected {
@@ -123,7 +124,15 @@
 
     /* --- Menu Icon --- */
     .menu-icon {
+        top: 24px;
         background: var(--bg-secondary); /* Ensure visibility */
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .top-bar {
+        height: .5rem;
+    }
+
+    section {
+        padding-block: 2rem;
     }
 }
