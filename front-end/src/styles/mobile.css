@@ -48,8 +48,8 @@
 
     /* --- Metrics Dashboard --- */
     .metrics-container {
-        grid-template-columns: 1fr 1fr; /* Stack cards */
-        gap: 1rem;
+        justify-content: space-between;
+        gap: .5rem;
         text-align: center;
     }
 
@@ -137,7 +137,7 @@
     }
 
     .metric-card {
-        width: 5rem;
+        width: 4.5rem;
           padding: .3rem;
 
           & h3 {
