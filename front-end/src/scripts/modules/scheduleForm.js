@@ -34,6 +34,17 @@ if (form) {
         if (dateTriggerText) {
             dateTriggerText.textContent = 'Select a date';
         }
+
+        // Reset the time picker trigger text
+        const timeTriggerText = document.querySelector('#time-picker-trigger-schedule .text');
+        const timeTrigger = document.querySelector('#time-picker-trigger-schedule');
+        
+        if (timeTriggerText) {
+            timeTriggerText.textContent = '--:--';
+        }
+        if (timeTrigger) {
+             timeTrigger.classList.remove('has-value');
+        }
     });
 }
 

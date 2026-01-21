@@ -98,3 +98,125 @@
         background-color: var(--color-primary);
     }
 }
+
+/* Custom Time Picker */
+.custom-time-picker {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.time-trigger {
+    width: 100%;
+    padding: .5rem;
+    font-size: 1.1rem;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-dim);
+    color: var(--text-muted);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.time-trigger.has-value {
+    color: var(--text-primary);
+}
+
+.time-trigger:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--text-disabled);
+}
+
+.time-trigger svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text-muted);
+}
+
+.time-dropdown {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-dim);
+    border-radius: 16px;
+    padding: 1rem;
+    z-index: 100;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.time-dropdown.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.time-header {
+    text-align: center;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.time-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    height: 140px;
+}
+
+.time-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    overflow-y: auto;
+    width: 45px;
+    scrollbar-width: none; 
+}
+
+.time-column::-webkit-scrollbar {
+    display: none; 
+}
+
+.time-option {
+    padding: 0.35rem 0;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    width: 100%;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    flex-shrink: 0; 
+}
+
+.time-option:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.time-option.selected {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.time-separator {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}

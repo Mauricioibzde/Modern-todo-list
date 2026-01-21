@@ -171,4 +171,8 @@
     overflow-y: auto;
 }
 
+.calendar-inline {
+    padding: .2rem!important;
+}
+
 }

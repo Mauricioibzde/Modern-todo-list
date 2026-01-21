@@ -4,6 +4,7 @@ import "./modules/menuSideBar.js"
 import "./modules/form.js"
 import { initNavigation } from "./modules/navigation.js"
 import { Calendar } from "./modules/calendar.js"
+import { CustomTimePicker } from "./modules/customTimePicker.js"
 import "./modules/scheduleForm.js"
 
 initNavigation();
@@ -15,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Form Date Picker (Schedules)
     new Calendar('#date-picker-trigger-schedule', '#schedule-date');
+
+    // Form Time Picker (Schedules)
+    new CustomTimePicker('#time-picker-trigger-schedule', '#schedule-time');
     
     // Full Page Calendar
     new Calendar({ containerSelector: '#full-page-calendar-container' });

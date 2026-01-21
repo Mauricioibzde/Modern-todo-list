@@ -49,6 +49,7 @@ main {
   grid-auto-flow: column;
   align-items: center;
   height: 100dvh;
+  background-color: var(--bg-gradient-end);
  
 }
 

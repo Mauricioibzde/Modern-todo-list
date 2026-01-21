@@ -15,7 +15,7 @@ li {
 }
 
 .list-tasks-ul {
-    background-color: var(--list-task-background);
+    margin: 0 auto;
     border-radius: 1rem;
 }
 
@@ -76,7 +76,7 @@ li {
                 }
 
                 span {
-                    font-size: 1.2rem;
+                    font-size: 0.8rem;
                     flex-grow: 1;
                     text-align: left;
                     justify-self: flex-start;
@@ -115,7 +115,7 @@ li {
                 /* active state */
                 max-height: 500px; /* Large enough to fit content */
                 opacity: 1;
-                padding: 1rem;
+                padding: 0.5rem;
                 border: solid var(--border-dim) 1px;
                 margin-top: 1rem; /* Simulate gap */
             }
