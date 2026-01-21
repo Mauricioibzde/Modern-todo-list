@@ -6,7 +6,8 @@ export function initNavigation() {
         'nav-all-tasks': '.list-tasks',
         'nav-search': '.search',
         'nav-insights': '.dashboard',
-        'nav-calendar': '.calendar-view'
+        'nav-calendar': '.calendar-view',
+        'nav-create-schedule': '.create-schedule'
     };
 
     const sections = document.querySelectorAll('main > section');

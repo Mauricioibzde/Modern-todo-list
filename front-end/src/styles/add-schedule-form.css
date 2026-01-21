@@ -1,0 +1,100 @@
+.create-schedule {
+     color: var(--text-primary);
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+      
+
+    h1 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    label {
+        margin-block: 0.5rem;
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+}
+
+
+.schedule-input {
+    display: grid;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    border: none;
+    
+    outline: none;              
+    box-shadow: none;           
+    appearance: none;           
+    -webkit-appearance: none;  
+    -moz-appearance: none;      
+
+    & label {
+        margin-bottom: 0.5rem;
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+}
+
+
+.add-schedule {
+  display: grid;
+  width: 100%;
+  max-width: 600px;
+
+  & input,
+  & textarea {
+    width: 100%;
+    padding: .5rem;
+    font-size: 1.1rem;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-dim);
+    color: var(--text-primary);
+    border-radius: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  & input:hover,
+  & textarea:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--text-disabled);
+  }
+
+  & input:focus,
+  & textarea:focus {
+    background-color: var(--bg-secondary);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px var(--focus-overlay-primary);
+  }
+}
+
+.add-schedule textarea {
+  resize: none;             
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+.add-schedule textarea::-webkit-resizer {
+  display: none;                
+}
+
+.btn-add-schedule {
+  margin: 0 auto;
+    width: 10rem;
+    padding: 0.4rem;
+    background-color: var(--bg-btn-dark);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 2rem;
+
+    &:hover {
+        background-color: var(--color-primary);
+    }
+}

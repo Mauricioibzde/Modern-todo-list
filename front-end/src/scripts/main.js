@@ -4,13 +4,17 @@ import "./modules/menuSideBar.js"
 import "./modules/form.js"
 import { initNavigation } from "./modules/navigation.js"
 import { Calendar } from "./modules/calendar.js"
+import "./modules/scheduleForm.js"
 
 initNavigation();
 
 // Initialize the custom calendar
 document.addEventListener('DOMContentLoaded', () => {
-    // Form Date Picker
+    // Form Date Picker (Tasks)
     new Calendar('#date-picker-trigger', '#due-date');
+
+    // Form Date Picker (Schedules)
+    new Calendar('#date-picker-trigger-schedule', '#schedule-date');
     
     // Full Page Calendar
     new Calendar({ containerSelector: '#full-page-calendar-container' });
