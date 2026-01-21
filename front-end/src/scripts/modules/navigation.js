@@ -7,7 +7,8 @@ export function initNavigation() {
         'nav-search': '.search',
         'nav-insights': '.dashboard',
         'nav-calendar': '.calendar-view',
-        'nav-create-schedule': '.create-schedule'
+        'nav-create-schedule': '.create-schedule',
+        'nav-all-schedules': '.list-schedules'
     };
 
     const sections = document.querySelectorAll('main > section');

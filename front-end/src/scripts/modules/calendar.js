@@ -148,6 +148,10 @@ export class Calendar {
     renderCalendar() {
         this.monthDisplay.textContent = this.currentDate.format('MMMM YYYY');
 
+        // Fetch data for counts
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+
         const dayElements = this.grid.querySelectorAll('.calendar-day');
         dayElements.forEach(el => el.remove());
 
@@ -168,9 +172,29 @@ export class Calendar {
         for (let i = 1; i <= daysInMonth; i++) {
             const dayEl = document.createElement('div');
             dayEl.className = 'calendar-day';
-            dayEl.textContent = i;
+            
+            // Create a span for the number to control positioning
+            const dayNumberSpn = document.createElement('span');
+            dayNumberSpn.className = 'day-number';
+            dayNumberSpn.textContent = i;
+            dayEl.appendChild(dayNumberSpn);
             
             const dayDate = this.currentDate.date(i);
+            const dateStr = dayDate.format('YYYY-MM-DD');
+
+            if (this.isInline) {
+                 const tasksForDay = tasks.filter(t => t.dueDate === dateStr).length;
+                 const schedulesForDay = schedules.filter(s => s.date === dateStr).length;
+                 const totalItems = tasksForDay + schedulesForDay;
+                 
+                 if (totalItems > 0) {
+                     const indicator = document.createElement('div');
+                     indicator.className = 'day-indicator';
+                     indicator.textContent = totalItems > 99 ? '99+' : totalItems;
+                     dayEl.prepend(indicator); // Add BEFORE the number (above)
+                     dayEl.classList.add('has-items');
+                 }
+            }
 
             if (today.isSame(dayDate, 'day')) {
                 dayEl.classList.add('today');
@@ -180,7 +204,45 @@ export class Calendar {
                 dayEl.classList.add('selected');
             }
 
+            if (dayDate.isBefore(today, 'day') && !this.isInline) {
+                 // Only disable past dates for input pickers, maybe? 
+                 // kept original logic:
+                dayEl.classList.add('disabled');
+            } else {
+                 if(dayDate.isBefore(today, 'day')) {
+                    // For inline calendar we might want to allow clicking past events or just view them
+                    // But original code disabled them. Let's keep consistent for now unless requested.
+                    dayEl.classList.add('disabled');
+                 } else {
+                    dayEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectDate(dayDate);
+                    });
+                 }
+            }
+            
+            // Fix: Override disabled check for Inline viewer if we want to see past events?
+            // The user didn't ask to see past events, just count.
+            // But if it's disabled, the style opacity makes it hard to see.
+            // Let's relax the disabled style for inline in CSS if needed, or remove disabled class for inline logic.
+            // For now, I'll stick to replacing the render logic block.
+
+            // Actually, wait. The original code block:
+            /*
             if (dayDate.isBefore(today, 'day')) {
+                dayEl.classList.add('disabled');
+            } else {
+                dayEl.addEventListener('click', ...);
+            }
+            */
+            // I should preserve this exactly to avoid regressions, except maybe for inline if I want interactivity.
+            // For now, I will use the exact replacement logic but insert the count.
+            
+            // RESET innerHTML logic above.
+            // I used appendChild / prepend.
+            
+            // We need to re-apply the listener logic correctly.
+             if (dayDate.isBefore(today, 'day')) {
                 dayEl.classList.add('disabled');
             } else {
                 dayEl.addEventListener('click', (e) => {

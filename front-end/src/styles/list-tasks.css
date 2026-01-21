@@ -1,4 +1,5 @@
-.list-tasks {
+.list-tasks,
+.list-schedules {
    background: var(--bg-gradient-main);
                 border-radius: .3rem;
     height: 100%;
@@ -14,15 +15,18 @@ li {
     box-shadow: 2px 0 0 0 var(--color-primary);
 }
 
-.list-tasks-ul {
+.list-tasks-ul,
+.list-schedules-ul {
     margin: 0 auto;
     border-radius: 1rem;
 }
 
-.tasks-container {
+.tasks-container,
+.schedules-container {
 
     
-    .no-tasks-message {
+    .no-tasks-message,
+    .no-schedules-message {
         display: none; /* Default hidden, logic will toggle block */
         padding: 2rem;
         color: var(--text-muted);
@@ -31,7 +35,8 @@ li {
     }
 
     /* Show when explicitly active or logic based */
-    .no-tasks-message.active {
+    .no-tasks-message.active,
+    .no-schedules-message.active {
         display: block;
     }
 
@@ -42,6 +47,7 @@ li {
 
         li {
             max-width: 600px;
+            min-width: 200px;
             margin: 0 auto 1rem auto;
             margin-top: 0.5rem;
             border-radius: 0.5rem;
@@ -141,7 +147,7 @@ li {
                     cursor: pointer;
                     border-radius: 4px;
                     font-size: 1rem;
-                    padding: 0.5rem 1rem; /* Added padding for better click area */
+                    padding: 0rem 1rem; /* Added padding for better click area */
                     transition: transform 0.2s ease;
 
                     &:hover {

@@ -8,10 +8,6 @@
         display: block; /* Stack content if grid was used */
     }
 
-    section {
-        padding: 5rem 1.5rem 2rem 1.5rem; /* Reduce padding */
-    }
-
     /* --- Sidebar (Mobile Menu) --- */
     .sidebar {
         width: 280px;
@@ -48,9 +44,12 @@
 
     /* --- Metrics Dashboard --- */
     .metrics-container {
-        justify-content: space-between;
-        gap: .5rem;
+        display: grid;
+        grid-auto-flow: row; /* Stack items logic or custom grid */
+        grid-template-columns: repeat(2, 1fr); /* 2 columns */
+        gap: 0.5rem;
         text-align: center;
+        width: 100%;
     }
 
     .metric-card .value {
@@ -82,8 +81,9 @@
         font-size: 0.85rem;
     }
 
-    /* --- List Tasks --- */
-    .list-tasks-ul li {
+    /* --- List Tasks & Schedules --- */
+    .list-tasks-ul li,
+    .list-schedules-ul li {
         flex-direction: column; /* Stack content in list item */
         align-items: flex-start;
         padding: 1rem;
@@ -128,51 +128,62 @@
         background: var(--bg-secondary); /* Ensure visibility */
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
+
     .top-bar {
-        height: .5rem;
+        height: 4rem; 
     }
 
     section {
-        padding-block: 2rem;
+     
     }
 
     .metric-card {
-        width: 4.5rem;
-          padding: .3rem;
+        width: 100%; /* Allow cards to take available width in grid */
+        max-width: none; 
+        padding: 1rem;
 
           & h3 {
-            font-size: .7rem;
+            font-size: 0.9rem;
           }
 
           & div {
-            font-size: .8rem!important;
+            font-size: 1.5rem!important;
           }
     }
 
     .insights-row {
      display: flex;
      justify-content: center;
+     flex-wrap: wrap; /* Allow wrapping */
+     gap: 1rem;
 }
 
 
 .insight-item {
     width: 100%;
-
+    max-width: 300px; /* Limit width */
 }
 
 .chart-container {
     width: 100%;
 }
 
-.list-tasks-ul {
-
-    margin-top: 10rem;
-    max-height: 480px;
-    overflow-y: auto;
+.list-tasks-ul,
+.list-schedules-ul {
+    margin-top: 1rem; /* Reset to reasonable margin */
+    max-height: none; /* Let it flow or set a reasonable max-height relative to viewport */
+    overflow-y: visible; /* Let section scroll */
 }
 
 .calendar-inline {
     padding: .2rem!important;
+}
+
+.tasks-container, .schedules-container {
+    ul {
+        list-style-type: none;
+        padding: 0!important; /* Remove excessive padding on ul, rely on li or container */
+    }
 }
 
 }

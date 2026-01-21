@@ -6,8 +6,10 @@ import { initNavigation } from "./modules/navigation.js"
 import { Calendar } from "./modules/calendar.js"
 import { CustomTimePicker } from "./modules/customTimePicker.js"
 import "./modules/scheduleForm.js"
+import { initScheduleList } from "./modules/scheduleList.js"
 
 initNavigation();
+initScheduleList();
 
 // Initialize the custom calendar
 document.addEventListener('DOMContentLoaded', () => {
