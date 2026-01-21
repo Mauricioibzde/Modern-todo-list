@@ -5,7 +5,8 @@ export function initNavigation() {
         'nav-list-tasks': '.list-tasks',
         'nav-all-tasks': '.list-tasks',
         'nav-search': '.search',
-        'nav-insights': '.dashboard' // Reuse dashboard for now
+        'nav-insights': '.dashboard',
+        'nav-calendar': '.calendar-view'
     };
 
     const sections = document.querySelectorAll('main > section');

@@ -138,3 +138,43 @@
     background-color: transparent;
     color: var(--text-muted);
 }
+
+/* --- Full Page Calendar (Inline) --- */
+.calendar-view {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.calendar-view-header h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+}
+
+.calendar-inline {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-dim);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Make inline calendar bigger */
+.calendar-inline .calendar-grid {
+    gap: 0.5rem; 
+}
+
+.calendar-inline .calendar-day {
+    padding: 1.5rem 0.5rem;
+    font-size: 1rem;
+    border-radius: 12px;
+}
+
+.calendar-inline .calendar-day-name {
+    font-size: 0.9rem;
+    padding-bottom: 1rem;
+}
+
+.calendar-inline .calendar-header h3 {
+    font-size: 1.25rem;
+}

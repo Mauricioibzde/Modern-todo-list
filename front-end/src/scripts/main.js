@@ -9,5 +9,9 @@ initNavigation();
 
 // Initialize the custom calendar
 document.addEventListener('DOMContentLoaded', () => {
+    // Form Date Picker
     new Calendar('#date-picker-trigger', '#due-date');
+    
+    // Full Page Calendar
+    new Calendar({ containerSelector: '#full-page-calendar-container' });
 });

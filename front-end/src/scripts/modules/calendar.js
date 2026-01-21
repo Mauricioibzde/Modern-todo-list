@@ -1,15 +1,40 @@
 import dayjs from 'https://cdn.jsdelivr.net/npm/dayjs@1.11.10/+esm';
 
 export class Calendar {
-    constructor(triggerSelector, inputSelector) {
-        this.trigger = document.querySelector(triggerSelector);
-        this.hiddenInput = document.querySelector(inputSelector);
-        
-        if (!this.trigger || !this.hiddenInput) return;
-
+    /**
+     * @param {Object|String} optionsOrTrigger - Config object OR trigger selector string (legacy support)
+     * @param {String} [inputSelector] - Input selector string (legacy support)
+     */
+    constructor(optionsOrTrigger, inputSelector) {
         this.currentDate = dayjs();
         this.selectedDate = null;
-        
+
+        if (typeof optionsOrTrigger === 'string') {
+            // Legacy mode: (trigger, input)
+            this.trigger = document.querySelector(optionsOrTrigger);
+            this.hiddenInput = document.querySelector(inputSelector);
+            this.isInline = false;
+        } else {
+            // Config object mode
+            const { triggerSelector, inputSelector, containerSelector } = optionsOrTrigger;
+            
+            if (containerSelector) {
+                this.container = document.querySelector(containerSelector);
+                this.isInline = true;
+            } else {
+                this.trigger = document.querySelector(triggerSelector);
+                this.hiddenInput = document.querySelector(inputSelector);
+                this.isInline = false;
+            }
+        }
+
+        // Validation
+        if (this.isInline) {
+            if (!this.container) return;
+        } else {
+            if (!this.trigger || !this.hiddenInput) return;
+        }
+
         this.init();
     }
 
@@ -20,10 +45,10 @@ export class Calendar {
     }
 
     createCalendarStructure() {
-        // Create dropdown container
-        this.dropdown = document.createElement('div');
-        this.dropdown.className = 'calendar-dropdown';
-        
+        // Create main wrapper
+        const calendarWrapper = document.createElement('div');
+        calendarWrapper.className = this.isInline ? 'calendar-inline' : 'calendar-dropdown';
+
         // Header
         this.header = document.createElement('div');
         this.header.className = 'calendar-header';
@@ -61,50 +86,57 @@ export class Calendar {
             this.grid.appendChild(el);
         });
 
-        this.daysContainer = document.createDocumentFragment(); // Wrapper logic handled in render
-
-        this.dropdown.appendChild(this.header);
-        this.dropdown.appendChild(this.grid);
+        calendarWrapper.appendChild(this.header);
+        calendarWrapper.appendChild(this.grid);
         
-        // Insert after trigger
-        this.trigger.parentNode.insertBefore(this.dropdown, this.trigger.nextSibling);
+        if (this.isInline) {
+            // Append directly to container
+            this.container.appendChild(calendarWrapper);
+        } else {
+            // Dropdown mode: Insert after trigger
+            this.dropdown = calendarWrapper;
+            this.trigger.parentNode.insertBefore(this.dropdown, this.trigger.nextSibling);
+        }
 
         // Bind nav events
         prevBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // prevent form submit
+            e.preventDefault(); 
             e.stopPropagation();
             this.changeMonth(-1);
         });
         nextBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // prevent form submit
+            e.preventDefault(); 
             e.stopPropagation();
             this.changeMonth(1);
         });
     }
 
     attachEvents() {
-        this.trigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.toggleCalendar();
-        });
+        if (!this.isInline) {
+            this.trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleCalendar();
+            });
 
-        document.addEventListener('click', (e) => {
-            if (!this.dropdown.contains(e.target) && !this.trigger.contains(e.target)) {
-                this.closeCalendar();
-            }
-        });
+            document.addEventListener('click', (e) => {
+                if (this.dropdown && !this.dropdown.contains(e.target) && !this.trigger.contains(e.target)) {
+                    this.closeCalendar();
+                }
+            });
+        }
     }
 
     toggleCalendar() {
+        if (this.isInline) return;
         this.dropdown.classList.toggle('show');
         const isVisible = this.dropdown.classList.contains('show');
         if (isVisible) {
-            // Reposition if needed or refresh
             this.renderCalendar();
         }
     }
 
     closeCalendar() {
+        if (this.isInline) return;
         this.dropdown.classList.remove('show');
     }
 
@@ -116,7 +148,6 @@ export class Calendar {
     renderCalendar() {
         this.monthDisplay.textContent = this.currentDate.format('MMMM YYYY');
 
-        // Clear existing days
         const dayElements = this.grid.querySelectorAll('.calendar-day');
         dayElements.forEach(el => el.remove());
 
@@ -141,17 +172,14 @@ export class Calendar {
             
             const dayDate = this.currentDate.date(i);
 
-            // Check if today
             if (today.isSame(dayDate, 'day')) {
                 dayEl.classList.add('today');
             }
 
-            // Check if selected
             if (this.selectedDate && this.selectedDate.isSame(dayDate, 'day')) {
                 dayEl.classList.add('selected');
             }
 
-            // Check if past
             if (dayDate.isBefore(today, 'day')) {
                 dayEl.classList.add('disabled');
             } else {
@@ -168,14 +196,14 @@ export class Calendar {
     selectDate(date) {
         this.selectedDate = date;
         
-        // Update Hidden Input (YYYY-MM-DD format for consistency)
-        this.hiddenInput.value = date.format('YYYY-MM-DD');
-
-        // Update Trigger Text
-        this.trigger.querySelector('.text').textContent = date.format('MMM D, YYYY');
-        this.trigger.classList.add('has-value');
-
-        this.closeCalendar();
-        this.renderCalendar(); // Re-render to show selected state
+        if (!this.isInline) {
+            this.hiddenInput.value = date.format('YYYY-MM-DD');
+            this.trigger.querySelector('.text').textContent = date.format('MMM D, YYYY');
+            this.trigger.classList.add('has-value');
+            this.closeCalendar();
+        } else {
+            // Inline mode: Just re-render
+            this.renderCalendar();
+        }
     }
 }
