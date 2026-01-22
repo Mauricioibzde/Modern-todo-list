@@ -1,0 +1,62 @@
+/* Notebook (Graph Paper) Background Pattern */
+
+/* --- Light Mode Settings --- */
+:root[data-theme="light"] body {
+    --grid-color: rgba(0, 0, 0, 0.15); /* Darker lines for visibility */
+    --grid-size: 24px;
+    background-color: #ffffff !important; 
+}
+
+/* --- Dark Mode Settings --- */
+:root:not([data-theme="light"]) body,
+:root[data-theme="dark"] body {
+    --grid-color: rgba(255, 255, 255, 0.04); /* Subtle white lines */
+    --grid-size: 24px;
+    background-color: var(--bg-main) !important;
+}
+
+/* --- Apply Background Pattern (Shared) --- */
+body {
+    background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px) !important;
+    
+    background-size: var(--grid-size) var(--grid-size) !important;
+    background-position: center top !important;
+    background-attachment: fixed !important;
+    min-height: 100vh;
+}
+
+/* 
+   --- Transparency for Containers ---
+   Make structure containers transparent so the body background shows through.
+   Applies to BOTH Light and Dark modes now.
+*/
+main,
+section,
+.dashboard,
+.list-tasks,
+.create-task,
+.list-schedules,
+.create-schedule,
+.search,
+.calendar-view {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* --- Opaque Elements --- */
+/* Keep opacity for nested cards/inputs so they remain readable */
+.metric-card,
+input,
+select, 
+textarea,
+.task-item,
+.schedule-item {
+     background-color: var(--bg-secondary) !important;
+}
+
+
