@@ -91,6 +91,12 @@ function setupCustomSelect(id, onSelect) {
 
     const trigger = container.querySelector('.filter-select-trigger');
     const optionsContainer = container.querySelector('.filter-select-options');
+    
+    // Remove 'hidden' class if present, as it conflicts with our CSS transitions
+    if (optionsContainer.classList.contains('hidden')) {
+        optionsContainer.classList.remove('hidden');
+    }
+
     const triggerSpan = trigger.querySelector('span');
     const options = container.querySelectorAll('.filter-option');
 
@@ -141,12 +147,19 @@ function populateCategoryFilter() {
 
     const categories = new Set();
     
-    // Get Task Categories
+    // 1. Get Categories from Definitions (ensure even empty categories are listed)
+    const definedTaskCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
+    definedTaskCategories.forEach(c => categories.add(c.value));
+
+    const definedScheduleCategories = JSON.parse(localStorage.getItem('scheduleCategories')) || [];
+    definedScheduleCategories.forEach(c => categories.add(c.value));
+
+    // 2. Get Task Categories (in case of legacy/deleted categories still in use)
     tasks.forEach(task => {
         if (task.category) categories.add(task.category);
     });
 
-    // Get Schedule Categories
+    // 3. Get Schedule Categories
     schedules.forEach(sch => {
         if (sch.category) categories.add(sch.category);
     });
@@ -167,7 +180,15 @@ function populateCategoryFilter() {
         const div = document.createElement('div');
         div.className = 'filter-option';
         div.dataset.value = cat;
-        div.textContent = cat;
+        // Try to find a nice label if available
+        const taskDef = definedTaskCategories.find(c => c.value === cat);
+        const schedDef = definedScheduleCategories.find(c => c.value === cat);
+        const label = (taskDef && taskDef.label) || (schedDef && schedDef.label) || cat;
+        
+        // Capitalize first letter if it looks raw
+        const displayLabel = label.charAt(0).toUpperCase() + label.slice(1);
+
+        div.textContent = displayLabel;
         categoryFilterOptionsContainer.appendChild(div);
     });
 }
@@ -222,7 +243,7 @@ function getPriority(categoryName, type) {
     const key = type === 'task' ? 'customCategories' : 'scheduleCategories';
     const categories = JSON.parse(localStorage.getItem(key)) || [];
     const cat = categories.find(c => c.value === categoryName);
-    return cat ? cat.priority : 'normal'; // Default to normal if not found
+    return cat ? cat.priority : 'low'; // Default to low if not found
 }
 
 function renderResults(items) {

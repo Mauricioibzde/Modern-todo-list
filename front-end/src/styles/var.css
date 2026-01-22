@@ -27,6 +27,9 @@
     
     /* Component Specific Backgrounds */
     --bg-icon-box: #e0e7ff;             /* Light Indigo Tint */
+    --bg-elevated: #ffffff;             /* Dropdowns/Modals */
+    --bg-hover: #f1f5f9;                /* Hover state */
+    --bg-active: #e0e7ff;               /* Active/Selected state */
     
     /* --- Text Colors --- */
     --text-primary: #1e293b;            /* Slate-800 */
@@ -66,6 +69,9 @@
     
     /* Component Specific Backgrounds */
     --bg-icon-box: #01275c77;           /* Menu Icon Background */
+    --bg-elevated: #161b22;             /* Dropdowns/Modals (Darker than secondary) */
+    --bg-hover: #1f2937;                /* Dark hover */
+    --bg-active: #1e1b4b;               /* Dark active (indigo tint) */
     
     /* --- Text Colors --- */
     --text-primary: #ffffff;            /* Pure White */

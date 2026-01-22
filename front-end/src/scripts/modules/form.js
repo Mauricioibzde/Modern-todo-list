@@ -120,6 +120,7 @@ function renderTasks() {
 
 function createTaskElement(task) {
     const li = document.createElement('li');
+    li.dataset.id = task.id; // Add ID for external referencing
     li.classList.toggle('completed', task.completed);
     li.classList.add('schedule-item');
 

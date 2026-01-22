@@ -36,6 +36,7 @@ function createScheduleElement(schedule) {
 
 
     const li = document.createElement('li');
+    li.dataset.id = schedule.id; // Add ID for referencing
     // Schedules might not have "completed" state like tasks, or maybe they do?
     // scheduleForm.js sets completed: false.
     li.classList.toggle('completed', schedule.completed);

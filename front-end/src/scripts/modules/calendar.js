@@ -1,4 +1,5 @@
 import dayjs from 'https://cdn.jsdelivr.net/npm/dayjs@1.11.10/+esm';
+import { showDayDetailsModal } from './modals.js';
 
 export class Calendar {
     /**
@@ -261,7 +262,7 @@ export class Calendar {
             // I used appendChild / prepend.
             
             // We need to re-apply the listener logic correctly.
-             if (dayDate.isBefore(today, 'day')) {
+             if (dayDate.isBefore(today, 'day') && !this.isInline) {
                 dayEl.classList.add('disabled');
             } else {
                 dayEl.addEventListener('click', (e) => {
@@ -283,7 +284,19 @@ export class Calendar {
             this.trigger.classList.add('has-value');
             this.closeCalendar();
         } else {
-            // Inline mode: Just re-render
+            // Inline mode: Show details modal
+            const dateStr = date.format('YYYY-MM-DD');
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+
+            const dayTasks = tasks.filter(t => t.dueDate === dateStr).map(t => ({...t, type: 'task'}));
+            const daySchedules = schedules.filter(s => s.date === dateStr).map(s => ({...s, type: 'schedule'}));
+            
+            const allItems = [...dayTasks, ...daySchedules];
+            
+            showDayDetailsModal(date.format('MMMM D, YYYY'), allItems);
+            
+            // Re-render to show selection state
             this.renderCalendar();
         }
     }
