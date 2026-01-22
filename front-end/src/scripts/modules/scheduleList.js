@@ -7,7 +7,7 @@ let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
 export function initScheduleList() {
     renderSchedules();
     checkEmptyState();
-    
+
     // Listen for updates from other modules
     document.addEventListener('schedulesUpdated', () => {
         reloadSchedules();
@@ -23,7 +23,7 @@ function reloadSchedules() {
 function renderSchedules() {
     if (!scheduleListUl) return;
     scheduleListUl.innerHTML = '';
-    
+
     schedules.forEach(schedule => {
         const li = createScheduleElement(schedule);
         scheduleListUl.appendChild(li);
@@ -38,7 +38,7 @@ function createScheduleElement(schedule) {
     // scheduleForm.js sets completed: false.
     li.classList.toggle('completed', schedule.completed);
     li.classList.add('schedule-item');
-    
+
     li.innerHTML = `
         <div class="task-header">
          <div class="status-schedule">
@@ -68,7 +68,7 @@ function createScheduleElement(schedule) {
         controls.classList.toggle('expanded');
         li.classList.toggle('focused');
         li.querySelector('.status-schedule').classList.toggle('active');
-        
+
 
     });
 
@@ -78,7 +78,7 @@ function createScheduleElement(schedule) {
         schedule.completed = e.target.checked;
         saveSchedules();
         li.classList.toggle('completed', schedule.completed);
-        
+
         // Optionally move to bottom or style differently
     });
 
@@ -87,7 +87,7 @@ function createScheduleElement(schedule) {
     if (deleteBtn) {
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if(confirm('Delete this schedule?')) {
+            if (confirm('Delete this schedule?')) {
                 schedules = schedules.filter(s => s.id !== schedule.id);
                 saveSchedules();
                 renderSchedules();

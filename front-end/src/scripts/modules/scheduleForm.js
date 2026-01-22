@@ -52,3 +52,4 @@ function saveSchedules() {
     localStorage.setItem('schedules', JSON.stringify(schedules));
     document.dispatchEvent(new CustomEvent('schedulesUpdated'));
 }
+

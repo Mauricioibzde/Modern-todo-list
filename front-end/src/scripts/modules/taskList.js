@@ -29,6 +29,3 @@ taskItems.forEach(taskItem => {
         console.log('Checkbox changed for task item');
     });
     });
-
-
-   

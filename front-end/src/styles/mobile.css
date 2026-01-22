@@ -134,6 +134,8 @@
     }
 
     section {
+        overflow-y: hidden;
+        padding: 4rem 2rem 4rem 2rem; /* Adjust padding for top bar */
      
     }
 
@@ -184,6 +186,18 @@
         list-style-type: none;
         padding: 0!important; /* Remove excessive padding on ul, rely on li or container */
     }
+}
+
+section {
+    justify-content:baseline;
+    margin-top: 1rem;
+    & h1 {
+        margin-bottom: 0;
+    }
+}
+
+.calendar-view {
+    margin-top: 1rem!important;
 }
 
 }
