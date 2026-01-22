@@ -8,9 +8,7 @@ const descriptionInput = document.querySelector('#description');
 const dateInput = document.querySelector('#due-date');
 const taskListUl = document.querySelector('.list-tasks .list-tasks-ul'); // Specific selector to avoid conflict
 const noTasksMessage = document.querySelector('.no-tasks-message');
-const searchInput = document.querySelector('#search-input');
-const searchResultsUl = document.querySelector('.search-results-ul');
-let currentSearchCategory = 'all';
+// Search logic moved to search.js
 
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let currentFilter = 'pending'; // 'all', 'pending'
@@ -20,13 +18,12 @@ let currentFilter = 'pending'; // 'all', 'pending'
 renderTasks();
 checkEmptyState();
 updateDashboard();
-generateSearchFilters(); // Generate filters on load
 
 // Save to LocalStorage helper
 function saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
     updateDashboard();
-    generateSearchFilters(); // Regenerate filters when tasks change
+    document.dispatchEvent(new CustomEvent('tasksUpdated'));
 }
 
 // Event listener for navigation filters
@@ -40,68 +37,6 @@ document.addEventListener('filterTasks', (e) => {
         listHeader.textContent = currentFilter === 'all' ? 'All Tasks' : 'Pending Tasks';
     }
 });
-
-// Event listener for Search
-if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        renderSearch(searchInput.value.toLowerCase());
-    });
-}
-
-function generateSearchFilters() {
-    const filtersContainer = document.getElementById('search-filters');
-    if (!filtersContainer) return;
-
-    // Get unique categories
-    const categories = new Set(['all']);
-    tasks.forEach(task => {
-        if (task.category) categories.add(task.category);
-    });
-
-    filtersContainer.innerHTML = '';
-    
-    categories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = `filter-chip ${currentSearchCategory === cat ? 'active' : ''}`;
-        btn.textContent = cat === 'all' ? 'All' : cat;
-        btn.dataset.filter = cat;
-        
-        btn.addEventListener('click', () => {
-            // Remove active class from all
-            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-            // Add to current
-            btn.classList.add('active');
-            currentSearchCategory = cat;
-            // Trigger search with current term
-            if (searchInput) renderSearch(searchInput.value.toLowerCase());
-        });
-        
-        filtersContainer.appendChild(btn);
-    });
-}
-
-function renderSearch(term) {
-    if (!searchResultsUl) return;
-    searchResultsUl.innerHTML = '';
-    
-    const filtered = tasks.filter(task => {
-        const matchesTerm = task.title.toLowerCase().includes(term) || 
-                            task.description.toLowerCase().includes(term);
-        const matchesCategory = currentSearchCategory === 'all' || task.category === currentSearchCategory;
-        
-        return matchesTerm && matchesCategory;
-    });
-
-    if (filtered.length === 0) {
-        searchResultsUl.innerHTML = '<li class="no-tasks-found">No tasks found.</li>';
-        return;
-    }
-
-    filtered.forEach(task => {
-        const li = createTaskElement(task);
-        searchResultsUl.appendChild(li);
-    });
-}
 
 if (form) {
     form.addEventListener('submit', function(event) {

@@ -30,6 +30,8 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                 </svg>
+                <div class="notification-badge hidden">0</div>
+            </button>
             </button>
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
             <!-- Sun Icon (for Dark Mode - click to switch to light) -->
@@ -245,12 +247,49 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="search-icon">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                     </svg>
-                    <input type="text" id="search-input" placeholder="Search tasks..." />
+                    <input type="text" id="search-input" placeholder="Search tasks or schedules..." />
                 </div>
                 
-                <div class="filter-chips" id="search-filters">
-                    <button class="filter-chip active" data-filter="all">All</button>
-                    <!-- More chips will be added dynamically by JS -->
+                <div class="search-advanced-filters">
+                    <!-- Type Filter -->
+                    <div class="custom-filter-select" id="filter-type">
+                         <div class="filter-select-trigger">
+                            <span>Type: All</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                         </div>
+                         <div class="filter-select-options hidden">
+                             <div class="filter-option" data-value="all">All Types</div>
+                             <div class="filter-option" data-value="task">Tasks</div>
+                             <div class="filter-option" data-value="schedule">Schedules</div>
+                         </div>
+                    </div>
+
+                    <!-- Priority Filter -->
+                    <div class="custom-filter-select" id="filter-priority">
+                         <div class="filter-select-trigger">
+                            <span>Priority: All</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                         </div>
+                         <div class="filter-select-options hidden">
+                             <div class="filter-option" data-value="all">All Priorities</div>
+                             <div class="filter-option" data-value="low">Low</div>
+                             <div class="filter-option" data-value="medium">Medium</div>
+                             <div class="filter-option" data-value="high">High</div>
+                             <div class="filter-option" data-value="extreme">Extreme</div>
+                         </div>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="custom-filter-select" id="filter-category">
+                         <div class="filter-select-trigger">
+                            <span>Category: All</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+                         </div>
+                         <div class="filter-select-options hidden" id="filter-category-options">
+                             <div class="filter-option" data-value="all">All Categories</div>
+                             <!-- Dynamically populated -->
+                         </div>
+                    </div>
                 </div>
             </div>
 

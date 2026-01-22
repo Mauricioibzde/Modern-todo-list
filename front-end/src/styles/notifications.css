@@ -108,3 +108,114 @@
     from { width: 100%; }
     to { width: 0%; }
 }
+
+/* Types */
+.toast.success { border-left: 4px solid var(--color-success); }
+.toast.success .toast-icon { color: var(--color-success); }
+
+.toast.error { border-left: 4px solid var(--color-danger); }
+.toast.error .toast-icon { color: var(--color-danger); }
+
+.toast.warning { border-left: 4px solid var(--color-warning); }
+.toast.warning .toast-icon { color: var(--color-warning); }
+
+.toast.info { border-left: 4px solid var(--color-primary); }
+.toast.info .toast-icon { color: var(--color-primary); }
+
+/* --- Notification Badge --- */
+.alert-btn {
+    position: relative; 
+    /* Ensure button has relative positioning for absolute badge */
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: var(--color-danger, #ef4444);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--bg-primary, #ffffff); /* Add border to separate from icon */
+}
+
+.notification-badge.hidden {
+    display: none;
+}
+
+/* --- Notification Modal List --- */
+#notification-list-modal .modal-content {
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+    margin-top: 1rem;
+}
+
+.notification-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-dim);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-item-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.notification-item-tag {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.notification-item-tag.task { background-color: rgba(16, 185, 129, 0.1); color: var(--color-success); }
+.notification-item-tag.schedule { background-color: rgba(59, 130, 246, 0.1); color: var(--color-primary); }
+
+.notification-item-info {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.notification-item-due {
+    font-size: 0.8rem;
+    color: var(--color-danger);
+    font-weight: 500;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
