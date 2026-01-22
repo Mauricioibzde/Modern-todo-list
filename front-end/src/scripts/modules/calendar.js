@@ -128,9 +128,23 @@ export class Calendar {
 
     toggleCalendar() {
         if (this.isInline) return;
-        this.dropdown.classList.toggle('show');
-        const isVisible = this.dropdown.classList.contains('show');
-        if (isVisible) {
+
+        // Close ANY open time dropdowns first
+        const timeDropdowns = document.querySelectorAll('.time-dropdown.show');
+        timeDropdowns.forEach(d => {
+            d.classList.remove('show');
+            setTimeout(() => d.style.display = 'none', 300);
+        });
+
+        if (this.dropdown.classList.contains('show')) {
+            this.closeCalendar();
+        } else {
+            // Ensure display is set if it was hidden by other scripts
+            this.dropdown.style.display = 'block';
+             // Force reflow to enable transition
+            void this.dropdown.offsetWidth;
+            
+            this.dropdown.classList.add('show');
             this.renderCalendar();
         }
     }
@@ -138,6 +152,11 @@ export class Calendar {
     closeCalendar() {
         if (this.isInline) return;
         this.dropdown.classList.remove('show');
+        setTimeout(() => {
+            if(!this.dropdown.classList.contains('show')) {
+                this.dropdown.style.display = 'none';
+            }
+        }, 300);
     }
 
     changeMonth(delta) {

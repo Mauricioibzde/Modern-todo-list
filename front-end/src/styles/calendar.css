@@ -1,7 +1,6 @@
 .custom-date-picker {
     position: relative;
     width: 100%;
-    margin-bottom: 1.5rem;
 }
 
 .date-trigger {
@@ -37,7 +36,7 @@
 
 .calendar-dropdown {
     position: absolute;
-    top: 110%;
+    bottom: 50%;
     left: 0;
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-dim);

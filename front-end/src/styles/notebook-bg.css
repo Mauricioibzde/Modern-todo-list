@@ -55,8 +55,18 @@ input,
 select, 
 textarea,
 .task-item,
-.schedule-item {
+.schedule-item,
+.insight-item,
+.chart-container {
      background-color: var(--bg-secondary) !important;
 }
+
+/* Add visible border to dashboard items (metric cards & insights) in Light Mode */
+:root[data-theme="light"] .metric-card,
+:root[data-theme="light"] .insight-item,
+:root[data-theme="light"] .chart-container {
+    border: 1px solid var(--text-secondary) !important;
+}
+
 
 

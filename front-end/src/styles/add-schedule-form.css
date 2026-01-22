@@ -103,7 +103,6 @@
 .custom-time-picker {
     position: relative;
     width: 100%;
-    margin-bottom: 1.5rem;
 }
 
 .time-trigger {
@@ -139,7 +138,7 @@
 
 .time-dropdown {
     position: absolute;
-    top: 110%;
+    bottom: 110%;
     left: 0;
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-dim);
@@ -181,7 +180,7 @@
     align-items: center;
     height: 100%;
     overflow-y: auto;
-    width: 45px;
+    width: 60px; /* Restored to column width */
     scrollbar-width: none; 
 }
 
@@ -190,12 +189,14 @@
 }
 
 .time-option {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 0.35rem 0;
     cursor: pointer;
     color: var(--text-secondary);
     transition: all 0.2s;
     width: 100%;
-    text-align: center;
     border-radius: 6px;
     font-size: 0.9rem;
     flex-shrink: 0; 

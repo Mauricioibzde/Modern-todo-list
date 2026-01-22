@@ -70,8 +70,15 @@ main {
     z-index: 1000;
 }
 
-.theme-toggle {
+.header-actions {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-btn,
+.theme-toggle {
     background: transparent;
     border: none;
     color: var(--text-primary);
@@ -83,6 +90,18 @@ main {
     justify-content: center;
     transition: background-color 0.2s;
 }
+
+.alert-btn:hover,
+.theme-toggle:hover {
+    background-color: var(--hover-overlay-light);
+}
+
+.alert-btn svg,
+.theme-toggle svg {
+    width: 24px;
+    height: 24px;
+}
+ 
 
 .theme-toggle:hover {
     background-color: var(--hover-overlay-medium);
@@ -127,4 +146,8 @@ section {
 
      .search-wrapper {
           padding: 1rem;
+     }
+
+     .insight-item  {
+      border: solid 1px var(--color-primary);
      }

@@ -1,6 +1,8 @@
 
 const scheduleListUl = document.querySelector('.list-schedules-ul');
 const noSchedulesMessage = document.querySelector('.no-schedules-message');
+import { showToast } from './notifications.js';
+import { showConfirmModal } from './modals.js';
 
 let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
 
@@ -39,6 +41,20 @@ function createScheduleElement(schedule) {
     li.classList.toggle('completed', schedule.completed);
     li.classList.add('schedule-item');
 
+    // Get priority from category
+    // For Schedules, we look at 'scheduleCategories'
+    const scheduleCategories = JSON.parse(localStorage.getItem('scheduleCategories')) || [];
+    // Fallback? If tasks can share categories logic is different, but user request separation.
+    
+    // We try to find in scheduleCategories first.
+    const categoryObj = scheduleCategories.find(c => c.value === schedule.category);
+    let priorityHtml = '';
+    
+    // Check if we have a category object with priority
+    if (categoryObj && categoryObj.priority) {
+        priorityHtml = `<span class="priority-dot ${categoryObj.priority}" title="Priority: ${categoryObj.priority}" style="margin-right: 8px; vertical-align: middle;"></span>`;
+    }
+
     li.innerHTML = `
         <div class="task-header">
          <div class="status-schedule">
@@ -48,11 +64,12 @@ function createScheduleElement(schedule) {
 
          </div>
             <input class="input-checkbox" type="checkbox" ${schedule.completed ? 'checked' : ''}>
-            <span class="name-task">${schedule.title}</span>
+            <span class="name-task" style="display: flex; align-items: center;">${priorityHtml}${schedule.title}</span>
             <span class="date-task">${schedule.date} at ${schedule.time}</span>
         </div>
         <div class="description">
             <span>${schedule.description}</span>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: #6b7280;">Category: ${schedule.category || 'Uncategorized'}</p>
         </div>
         <div class="controls">
             <button class="delete-button">Delete</button>
@@ -87,12 +104,18 @@ function createScheduleElement(schedule) {
     if (deleteBtn) {
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (confirm('Delete this schedule?')) {
-                schedules = schedules.filter(s => s.id !== schedule.id);
-                saveSchedules();
-                renderSchedules();
-                checkEmptyState();
-            }
+            showConfirmModal({
+                title: 'Delete Schedule',
+                message: 'Are you sure you want to delete this schedule? This action cannot be undone.',
+                confirmText: 'Delete',
+                onConfirm: () => {
+                    schedules = schedules.filter(s => s.id !== schedule.id);
+                    saveSchedules();
+                    renderSchedules();
+                    checkEmptyState();
+                    showToast('Schedule deleted successfully', 'success');
+                }
+            });
         });
     }
 

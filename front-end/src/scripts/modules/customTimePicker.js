@@ -20,7 +20,6 @@ export class CustomTimePicker {
     }
 
     createDropdown() {
-        // Check if dropdown already exists
         if (this.container.querySelector('.time-dropdown')) return;
 
         this.dropdown = document.createElement('div');
@@ -33,12 +32,14 @@ export class CustomTimePicker {
         const selector = document.createElement('div');
         selector.classList.add('time-selector');
 
+        // Create Hours Column
         const hoursColumn = this.createColumn(24, 'hour');
         
         const separator = document.createElement('div');
         separator.classList.add('time-separator');
         separator.textContent = ':';
         
+        // Create Minutes Column
         const minutesColumn = this.createColumn(60, 'minute');
 
         selector.appendChild(hoursColumn);
@@ -55,33 +56,39 @@ export class CustomTimePicker {
         const column = document.createElement('div');
         column.classList.add('time-column', type);
 
-        for (let i = 0; i < count; i++) {
-            const value = i.toString().padStart(2, '0');
-            const option = document.createElement('div');
-            option.classList.add('time-option');
-            option.textContent = value;
-            option.dataset.value = value;
-            option.dataset.type = type;
-            
-            option.addEventListener('click', (e) => this.handleSelection(e, type, value));
-            
-            column.appendChild(option);
+        // Infinite Scroll Illusion: Duplicate the list multiple times
+        // 50 copies of the set ensures plenty of scroll room
+        const loopCount = 50; 
+
+        for (let j = 0; j < loopCount; j++) {
+            for (let i = 0; i < count; i++) {
+                const val = i.toString().padStart(2, '0');
+                const option = document.createElement('div');
+                option.classList.add('time-option');
+                option.textContent = val;
+                option.dataset.value = val;
+                
+                // Add a unique ID or index if needed, but data-value is enough for selection
+                option.addEventListener('click', (e) => this.handleSelection(e, type, val));
+                column.appendChild(option);
+            }
         }
-        
         return column;
     }
 
     handleSelection(e, type, value) {
         e.stopPropagation();
         
-        // Remove active class from siblings
-        const siblings = e.target.parentElement.children;
-        Array.from(siblings).forEach(el => el.classList.remove('selected'));
+        // Clear 'selected' from ALL items in this column
+        const column = e.target.parentElement;
+        const allOptions = column.querySelectorAll('.time-option');
+        allOptions.forEach(el => el.classList.remove('selected'));
         
-        // Add active class
-        e.target.classList.add('selected');
+        // Add 'selected' to ALL duplicate items with the same value
+        const matchingOptions = column.querySelectorAll(`.time-option[data-value="${value}"]`);
+        matchingOptions.forEach(el => el.classList.add('selected'));
 
-        if (type === 'hour') {
+        if(type === 'hour') {
             this.selectedHour = value;
         } else {
             this.selectedMinute = value;
@@ -91,22 +98,78 @@ export class CustomTimePicker {
     }
 
     updateValue() {
-        if (this.selectedHour !== null && this.selectedMinute !== null) {
-            const timeString = `${this.selectedHour}:${this.selectedMinute}`;
-            this.input.value = timeString;
-            
+        // If one is missing, use default
+        const h = this.selectedHour || '00';
+        const m = this.selectedMinute || '00';
+        
+        const timeString = `${h}:${m}`;
+        this.input.value = timeString;
+        
+        // Update display input if it exists
+        const displayInput = this.trigger.querySelector('.time-display-input');
+        if (displayInput) {
+            displayInput.value = timeString;
+        } else {
+            // Fallback for old span structure if needed
             const textSpan = this.trigger.querySelector('.text');
             if (textSpan) textSpan.textContent = timeString;
-            
-            this.trigger.classList.add('has-value');
+        }
+        
+        this.trigger.classList.add('has-value');
+
+        // Only close if BOTH are explicitly selected? 
+        // Or keep open to allow minute adjustment.
+        // Let's NOT auto-close immediately to allow adjustment.
+        // Or maybe check if strict selection took place?
+        // For better UX, let user click off to close, or close after minute selection if hour was already selected?
+        
+        if(this.selectedHour && this.selectedMinute) {
+             // Maybe wait a bit?
         }
     }
+
+    // Unused now
+    handleTimeSelection() {} 
+
 
     attachEvents() {
         this.trigger.addEventListener('click', (e) => {
             e.stopPropagation();
+            // Don't toggle if clicking the input (let it focus)
+            if (e.target.classList.contains('time-display-input')) return;
             this.toggleDropdown();
         });
+
+        const displayInput = this.trigger.querySelector('.time-display-input');
+        if (displayInput) {
+            // Input Masking
+            displayInput.addEventListener('input', (e) => {
+                let val = e.target.value.replace(/[^0-9:]/g, '');
+                
+                // Simple auto-colon if typing straight numbers
+                if (val.length === 2 && !val.includes(':') && e.inputType !== 'deleteContentBackward') {
+                    val += ':';
+                }
+                if (val.length > 5) val = val.slice(0, 5);
+                e.target.value = val;
+            });
+
+            displayInput.addEventListener('change', (e) => {
+                this.validateAndSetTime(e.target.value);
+            });
+
+            displayInput.addEventListener('blur', (e) => {
+                this.validateAndSetTime(e.target.value);
+            });
+
+            displayInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    this.validateAndSetTime(e.target.value);
+                    displayInput.blur();
+                    this.closeDropdown();
+                }
+            });
+        }
 
         // Close when clicking outside
         document.addEventListener('click', (e) => {
@@ -116,16 +179,61 @@ export class CustomTimePicker {
         });
     }
 
+    validateAndSetTime(val) {
+        // Simple parser
+        if (!val) return;
+        
+        let h, m;
+
+        if (val.includes(':')) {
+            const parts = val.split(':');
+            h = parseInt(parts[0]);
+            m = parseInt(parts[1]);
+        } else if (val.length === 4) {
+            // 0930 format
+            h = parseInt(val.substring(0, 2));
+            m = parseInt(val.substring(2, 4));
+        }
+
+        if (h !== undefined && !isNaN(h) && m !== undefined && !isNaN(m)) {
+            // Validate ranges
+            if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+                 this.selectedHour = h.toString().padStart(2, '0');
+                 this.selectedMinute = m.toString().padStart(2, '0');
+                 this.updateValue(); // Valid update
+                 return;
+            }
+        }
+        
+        // If invalid, re-render currently selected or clear if none
+        if (this.selectedHour && this.selectedMinute) {
+             this.updateValue(); 
+        } else {
+            // Invalid and no state, maybe clear?
+            // Keep user input? No, enforce format.
+            // this.updateValue() uses defaults 00:00 in current logic which might be annoying if user just cleared it on purpose.
+            // But let's stick to safe defaults.
+        }
+    }
+
     toggleDropdown() {
-        // Close other dropdowns if needed (optional)
+        // Close other dropdowns if needed
         const allDropdowns = document.querySelectorAll('.time-dropdown.show, .calendar-dropdown.show');
         allDropdowns.forEach(d => {
-            if (d !== this.dropdown) d.classList.remove('show');
+            if (d !== this.dropdown) {
+                d.classList.remove('show');
+                // Ensure they get hidden if they have inline styles
+                setTimeout(() => { if(!d.classList.contains('show')) d.style.display = 'none'; }, 300);
+            }
         });
 
-        this.dropdown.classList.toggle('show');
-        
         if (this.dropdown.classList.contains('show')) {
+            this.closeDropdown();
+        } else {
+            this.dropdown.style.display = 'block';
+            // Force reflow
+            void this.dropdown.offsetWidth;
+            this.dropdown.classList.add('show');
             this.scrollToSelected();
         }
     }
@@ -133,17 +241,36 @@ export class CustomTimePicker {
     closeDropdown() {
         if (this.dropdown) {
             this.dropdown.classList.remove('show');
+            setTimeout(() => {
+                // Check if it's still closed before hiding (prevent race condition if quickly reopened)
+                if (!this.dropdown.classList.contains('show')) {
+                    this.dropdown.style.display = 'none';
+                }
+            }, 300);
         }
     }
 
     scrollToSelected() {
-        if(this.selectedHour) {
-             const hourEl = this.dropdown.querySelector(`.time-column.hour .time-option[data-value="${this.selectedHour}"]`);
-             if(hourEl) hourEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        }
-        if(this.selectedMinute) {
-             const minEl = this.dropdown.querySelector(`.time-column.minute .time-option[data-value="${this.selectedMinute}"]`);
-             if(minEl) minEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        }
+        // Helper to scroll to the middle-most instance of the value
+        const scrollColumn = (type, value) => {
+            const column = this.dropdown.querySelector(`.time-column.${type}`);
+            if(!column || !value) return;
+
+            const allMatches = column.querySelectorAll(`.time-option[data-value="${value}"]`);
+            if(allMatches.length > 0) {
+                 // Pick the middle instance to allow scrolling both ways
+                 const middleIndex = Math.floor(allMatches.length / 2);
+                 const targetEl = allMatches[middleIndex];
+                 
+                 setTimeout(() => targetEl.scrollIntoView({ block: 'center' }), 50);
+            }
+        };
+
+        if(this.selectedHour) scrollColumn('hour', this.selectedHour);
+        // Default scroll to 00 middle if not selected
+        else scrollColumn('hour', '00'); 
+
+        if(this.selectedMinute) scrollColumn('minute', this.selectedMinute);
+        else scrollColumn('minute', '00');
     }
 }

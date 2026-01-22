@@ -1,4 +1,6 @@
 import { updateDashboard } from './dashboard.js';
+import { showToast } from './notifications.js';
+import { showConfirmModal } from './modals.js';
 
 const form = document.querySelector('.add-task');
 const titleInput = document.querySelector('#title');
@@ -106,16 +108,40 @@ if (form) {
         event.preventDefault();
 
         // Select the category input which is dynamically created
-        const categoryInput = document.querySelector('#category');
+        const categoryInput = document.querySelector('#task-category');
+        
+        // --- Validation Start ---
+        const titleValue = titleInput.value.trim();
+        const descriptionValue = descriptionInput.value.trim();
+        const dateValue = dateInput.value;
+        const categoryValue = categoryInput ? categoryInput.value : '';
+
+        const errors = [];
+
+        if (!titleValue) {
+            errors.push("Title is required.");
+        } else if (titleValue.length < 3) {
+            errors.push("Title must be at least 3 characters long.");
+        }
+
+        if (!dateValue) {
+            errors.push("Due date is required.");
+        }
+
+        if (errors.length > 0) {
+            showToast("Please fix the following errors:\n- " + errors.join("\n- "), 'error', 'Validation Failed');
+            return; // Stop submission
+        }
+        // --- Validation End ---
 
         const newTask = {
             id: Date.now(), // Unique ID for finding/deleting
             createdAt: new Date().toISOString(),
             completedAt: null,
-            title: titleInput.value,
-            description: descriptionInput.value,
-            dueDate: dateInput.value,
-            category: categoryInput ? categoryInput.value : 'Uncategorized',
+            title: titleValue,
+            description: descriptionValue,
+            dueDate: dateValue,
+            category: categoryValue || 'Uncategorized',
             completed: false
         };
 
@@ -128,7 +154,7 @@ if (form) {
         // If we are adding, we probably want to see feedback, but let's just re-render list.
         renderTasks();
         checkEmptyState();
-        alert("Task Created Successfully!"); // Feedback for user
+        showToast("Task created successfully!", 'success'); // Feedback for user
         
         form.reset();
         
@@ -161,6 +187,16 @@ function createTaskElement(task) {
     const li = document.createElement('li');
     li.classList.toggle('completed', task.completed);
     li.classList.add('schedule-item');
+
+    // Get priority from category
+    const customCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
+    const categoryObj = customCategories.find(c => c.value === task.category);
+    let priorityHtml = '';
+    
+    // Check if we have a category object with priority
+    if (categoryObj && categoryObj.priority) {
+        priorityHtml = `<span class="priority-dot ${categoryObj.priority}" title="Priority: ${categoryObj.priority}" style="margin-right: 8px; vertical-align: middle;"></span>`;
+    }
     
     li.innerHTML = `
         <div class="task-header">
@@ -172,7 +208,7 @@ function createTaskElement(task) {
                         </svg>
             </div>
             <input class="input-checkbox" type="checkbox" ${task.completed ? 'checked' : ''}>
-            <span class="name-task">${task.title}</span>
+            <span class="name-task" style="display: flex; align-items: center;">${priorityHtml}${task.title}</span>
             <span class="date-task">Due: ${task.dueDate}</span>
         </div>
         <div class="description">
@@ -224,14 +260,20 @@ function createTaskElement(task) {
     if (deleteBtn) {
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if(confirm('Delete this task?')) {
-                tasks = tasks.filter(t => t.id !== task.id);
-                saveTasks();
-                renderTasks();
-                checkEmptyState();
-                // Also update search view if active
-                if (searchInput && searchInput.value) renderSearch(searchInput.value);
-            }
+            showConfirmModal({
+                title: 'Delete Task',
+                message: 'Are you sure you want to delete this task? This action cannot be undone.',
+                confirmText: 'Delete',
+                onConfirm: () => {
+                    tasks = tasks.filter(t => t.id !== task.id);
+                    saveTasks();
+                    renderTasks();
+                    checkEmptyState();
+                    // Also update search view if active
+                    if (searchInput && searchInput.value) renderSearch(searchInput.value);
+                    showToast('Task deleted successfully', 'success');
+                }
+            });
         });
     }
 

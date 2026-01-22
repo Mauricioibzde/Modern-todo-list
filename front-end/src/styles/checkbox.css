@@ -14,6 +14,17 @@ input[type="checkbox"] {
     place-content: center;
 }
 
+/* Specific visibility fix for Light Mode as requested */
+html[data-theme="light"] input[type="checkbox"] {
+    border-color: #000000 !important;
+    border-width: 2px !important;
+}
+
+html[data-theme="light"] input[type="checkbox"]:checked {
+    background-color: #000000 !important; /* Force black fill */
+    border-color: #000000 !important;
+}
+
 input[type="checkbox"]:checked {
     background-color: var(--color-primary);
     border-color: var(--color-primary);
@@ -31,6 +42,12 @@ input[type="checkbox"]::before {
 }
 
 input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
+/* Ensure checkmark is White in Light Mode */
+html[data-theme="light"] input[type="checkbox"]:checked::before {
+    background-color: white !important; 
     transform: scale(1);
 }
 

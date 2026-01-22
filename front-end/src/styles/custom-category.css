@@ -61,6 +61,28 @@
     border: 1px solid var(--border-dim);
     border-top: none;
     border-radius: 0 0 6px 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-muted) transparent; 
+}
+
+/* Custom Scrollbar */
+.select-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+.select-items::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.select-items::-webkit-scrollbar-thumb {
+    background-color: var(--text-muted);
+    border-radius: 10px;
+}
+
+.select-items::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-secondary);
 }
 
 .select-items div {
@@ -81,5 +103,116 @@
 }
 
 .select-items div:hover, .same-as-selected {
-    background-color: var(--hover-highlight);
+    background-color: var(--hover-highlight, rgba(0, 0, 0, 0.05));
+    color: var(--color-primary);
+}
+
+
+/* --- Custom Category Modal Overlay --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 16px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    border: 1px solid var(--border-dim);
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box; 
+}
+
+.modal-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--focus-overlay-primary);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.modal-btn-cancel {
+    background-color: var(--bg-btn-dark, #e2e8f0); 
+    color: var(--text-secondary);
+}
+
+.modal-btn-cancel:hover {
+    background-color: var(--border-dim);
+    filter: brightness(0.95);
+}
+
+.modal-btn-confirm {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.modal-btn-confirm:hover {
+    filter: brightness(1.1);
+}
+
+.modal-btn-delete {
+    background-color: var(--color-danger);
+    color: white;
+}
+
+.modal-btn-delete:hover {
+    filter: brightness(0.9);
 }
