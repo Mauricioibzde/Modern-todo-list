@@ -3,11 +3,53 @@
 :root {
     /* --- Fonts --- */
     --font-primary: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --color-danger: #ef4444;            /* Red-500 */
+}
 
+/* Light Theme */
+:root[data-theme="light"] {
+    /* --- Brand Colors --- */
+    --color-primary: #4f46e5;           /* Indigo-600 */
+    --color-primary-rgb: 79, 70, 229;
+    
+    /* --- Backgrounds --- */
+    --bg-main: #f0f2f5;                 /* Light Gray Background */
+    --bg-secondary: #ffffff;            /* White (Forms/Cards) */
+    --bg-tertiary: #f8fafc;             /* Very light gray for lists */
+    --bg-btn-dark: #e2e8f0;             /* Light Button Background */
+    
+    /* Gradients */
+    --bg-gradient-start: #f8fafc;
+    --bg-gradient-end: #f1f5f9;
+    --bg-gradient-main: linear-gradient(180deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    
+    /* Component Specific Backgrounds */
+    --bg-icon-box: #e0e7ff;             /* Light Indigo Tint */
+    
+    /* --- Text Colors --- */
+    --text-primary: #1e293b;            /* Slate-800 */
+    --text-secondary: #475569;          /* Slate-600 */
+    --text-muted: #94a3b8;              /* Slate-400 */
+    --text-disabled: #cbd5e1;           /* Slate-300 */
+
+    /* --- Borders & Outlines --- */
+    --border-dim: #e2e8f0;              /* Slate-200 */
+    --border-input: #cbd5e1;            /* Slate-300 */
+    --border-divider: rgba(0, 0, 0, 0.1);
+
+    /* --- Interactions / States --- */
+    --hover-overlay-light: rgba(0, 0, 0, 0.05);
+    --hover-overlay-medium: rgba(0, 0, 0, 0.1);
+    --focus-overlay-primary: rgba(79, 70, 229, 0.2); 
+
+    --list-task-background: #ffffff;
+}
+
+/* Dark Theme (Default) */
+:root, :root[data-theme="dark"] {
     /* --- Brand Colors --- */
     --color-primary: #444584;           /* Indigo-500 */
     --color-primary-rgb: 99, 102, 241;  /* For RGBA usage */
-    --color-danger: #ef4444;            /* Red-500 */
     
     /* --- Backgrounds --- */
     --bg-main: #0d1117;                 /* Deep dark background */

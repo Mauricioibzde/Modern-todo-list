@@ -8,7 +8,7 @@
   background: var(--bg-gradient-main);
   color: var(--text-secondary);
   flex-direction: column;
-  padding: 40px 16px 16px 16px;
+  padding: 40px 16px 80px 16px;
   z-index: 99;
   left: 0;
   height: 100vh;
@@ -42,9 +42,6 @@ main.sidebar-closed {
 }
 
 .menu-icon {
-  position: fixed;
-  top: 16px;
-  left: 20px;
   width: 32px;
   height: 32px;
   background: var(--bg-icon-box);
@@ -55,6 +52,7 @@ main.sidebar-closed {
   z-index: 100;
   cursor: pointer;
   color: var(--text-primary);
+  margin-right: 1rem; /* Spacing from edge or title if added later */
 }
 
 /* Menu */

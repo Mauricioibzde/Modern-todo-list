@@ -7,12 +7,15 @@ import { Calendar } from "./modules/calendar.js"
 import { CustomTimePicker } from "./modules/customTimePicker.js"
 import "./modules/scheduleForm.js"
 import { initScheduleList } from "./modules/scheduleList.js"
+import { initTheme } from "./modules/theme.js"
 
 initNavigation();
 initScheduleList();
 
 // Initialize the custom calendar
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+
     // Form Date Picker (Tasks)
     new Calendar('#date-picker-trigger', '#due-date');
 

@@ -10,6 +10,8 @@ body {
 
      height: 100vh;
      overflow-y: hidden;
+     background-color: var(--bg-main);
+     color: var(--text-primary);
 }
 
 h1 {
@@ -59,12 +61,36 @@ main {
     left: 0;
     width: 100%;
     height: 4rem;
-     background: linear-gradient(180deg, #0b1220, #0f1b2d);
+    background: var(--bg-secondary); /* Use variable for theme support */
+    border-bottom: 1px solid var(--border-dim);
     display: flex;
     align-items: center;
     padding: 0 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+}
+
+.theme-toggle {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+    background-color: var(--hover-overlay-medium);
+}
+
+.theme-toggle svg {
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 section {

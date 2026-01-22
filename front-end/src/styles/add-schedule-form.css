@@ -235,7 +235,7 @@
     position: absolute;
      bottom: 50%;
      right: -23px;
-    color: black;
+    color: var(--text-primary);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -251,7 +251,7 @@
       & svg {
         width: 1.5rem;
         height: 1.5rem;
-       color: white;
+       color: var(--text-primary);
     }
 }
 

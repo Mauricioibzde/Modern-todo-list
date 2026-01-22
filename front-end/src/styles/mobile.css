@@ -104,6 +104,7 @@
     .description {
         padding-left: 0; /* Remove indent on mobile */
         width: 100%;
+       
     }
 
     /* --- Add Task Form --- */
@@ -124,7 +125,7 @@
 
     /* --- Menu Icon --- */
     .menu-icon {
-        top: 24px;
+        /* top: 24px; Removed as we rely on flexbox in top-bar */
         background: var(--bg-secondary); /* Ensure visibility */
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }

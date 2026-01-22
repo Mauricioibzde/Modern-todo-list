@@ -111,6 +111,8 @@ li {
                 transition: all 0.3s ease-in-out;
 
                 span {
+                    display: flex;
+                    justify-content: left;
                     font-size: 1rem;
                     color: var(--text-muted);
                     
@@ -143,7 +145,7 @@ li {
                 .delete-button {
                     background-color: var(--color-primary);
                     border: none;
-                    color: var(--text-primary);
+                    color: #ffffff; /* Fixed white text for contrast on colored background */
                     cursor: pointer;
                     border-radius: 4px;
                     font-size: 1rem;
@@ -155,9 +157,7 @@ li {
                     }
                 }
 
-                .delete-button {
-                    background-color: var(--color-danger);
-                }
+           
             }
 
             & .controls.expanded {
