@@ -1,4 +1,5 @@
 import { showToast } from './notifications.js';
+import { dbService } from '../services/db.js';
 
 let currentExpiringItems = [];
 
@@ -7,12 +8,15 @@ export function initReminders() {
     if (alertBtn) {
         alertBtn.addEventListener('click', showNotificationModal);
     }
+    
+    // Listen for data updates to re-check immediately
+    document.addEventListener('tasksUpdated', () => checkReminders(true));
+    document.addEventListener('schedulesUpdated', () => checkReminders(true));
 
-    // Run immediately on load
-    checkReminders(true);
-
-    // Then run every 30 minutes
-    setInterval(() => checkReminders(true), 30 * 60 * 1000);
+    // Run immediately on load (wait for DB sync though? initListeners does initial fetch)
+    // We can rely on the events above to trigger the first check.
+    // But keeps the interval for time-passing updates.
+    setInterval(() => checkReminders(false), 30 * 60 * 1000); // 30 mins
 }
 
 function checkReminders(shouldNotify = false) {
@@ -24,9 +28,9 @@ function checkReminders(shouldNotify = false) {
     const threeDaysFromNow = new Date();
     threeDaysFromNow.setDate(now.getDate() + 3);
 
-    // Get Data
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+    // Get Data from Service
+    const tasks = dbService.getTasksSync();
+    const schedules = dbService.getSchedulesSync();
 
     // Check Tasks
     tasks.forEach(task => {

@@ -1,6 +1,7 @@
 import { updateDashboard } from './dashboard.js';
 import { showToast } from './notifications.js';
 import { showConfirmModal } from './modals.js';
+import { dbService } from '../services/db.js';
 
 const form = document.querySelector('.add-task');
 const titleInput = document.querySelector('#title');
@@ -10,21 +11,19 @@ const taskListUl = document.querySelector('.list-tasks .list-tasks-ul'); // Spec
 const noTasksMessage = document.querySelector('.no-tasks-message');
 // Search logic moved to search.js
 
-let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let tasks = []; // Will be synced from DB
 let currentFilter = 'pending'; // 'all', 'pending'
 
 // Initialize
-// We need re-render based on local storage
-renderTasks();
-checkEmptyState();
-updateDashboard();
-
-// Save to LocalStorage helper
-function saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    updateDashboard();
+// Subscribe to real-time updates
+dbService.onTasksSnapshot((updatedTasks) => {
+    tasks = updatedTasks;
+    renderTasks();
+    checkEmptyState();
+    updateDashboard(); // Updates global counts
+    // LocalStorage fallback for non-DB parts? No, fully switch.
     document.dispatchEvent(new CustomEvent('tasksUpdated'));
-}
+});
 
 // Event listener for navigation filters
 document.addEventListener('filterTasks', (e) => {
@@ -70,7 +69,7 @@ if (form) {
         // --- Validation End ---
 
         const newTask = {
-            id: Date.now(), // Unique ID for finding/deleting
+            // id: Date.now(), // Firestore generates ID
             createdAt: new Date().toISOString(),
             completedAt: null,
             title: titleValue,
@@ -80,26 +79,30 @@ if (form) {
             completed: false
         };
 
-        tasks.push(newTask); 
-        saveTasks();
-        console.log('Task Added:', newTask);
+        // tasks.push(newTask); 
+        // saveTasks();
+        dbService.addTask(newTask).then(() => {
+            console.log('Task Added');
+            showToast("Task created successfully!", 'success');
+             form.reset();
+        
+            // Reset the visual custom select
+            const selectedDiv = document.querySelector('.select-selected');
+            if (selectedDiv) {
+                selectedDiv.textContent = 'Select Category';
+                // Also clear the hidden input value
+                if (categoryInput) categoryInput.value = '';
+            }
+        }).catch(err => {
+            console.error(err);
+            showToast("Error creating task", 'error');
+        });
 
-        // Only render if it matches current filter (e.g. if we are in "Pending" or "All")
-        // But typically we switch view or just update. 
-        // If we are adding, we probably want to see feedback, but let's just re-render list.
-        renderTasks();
-        checkEmptyState();
-        showToast("Task created successfully!", 'success'); // Feedback for user
+        // Optimistic UI or wait for snapshot? Snapshot is fast enough usually.
+        // checkEmptyState(); // Will be handled by snapshot
         
-        form.reset();
-        
-        // Reset the visual custom select
-        const selectedDiv = document.querySelector('.select-selected');
-        if (selectedDiv) {
-            selectedDiv.textContent = 'Select Category';
-            // Also clear the hidden input value
-            if (categoryInput) categoryInput.value = '';
-        }
+       
+
     });
 }
 
@@ -171,24 +174,16 @@ function createTaskElement(task) {
     // Checkbox Logic
     li.querySelector('.input-checkbox').addEventListener('change', (e) => {
         e.stopPropagation();
-        task.completed = e.target.checked;
+        const checked = e.target.checked;
+        const updates = {
+            completed: checked,
+            completedAt: checked ? new Date().toISOString() : null
+        };
         
-        // Update timestamp for insights
-        if (task.completed) {
-            task.completedAt = new Date().toISOString();
-        } else {
-            task.completedAt = null;
-        }
-
-        saveTasks();
-        li.classList.toggle('completed', task.completed);
+        dbService.updateTask(task.id, updates);
         
-        // If we in "pending" view, removing a completed task might be desired or just fade it.
-        // For now, let's keep it until refresh or filter change, OR re-render immediately.
-        // Re-rendering immediately feels snappy.
-        if (currentFilter === 'pending' && task.completed) {
-            renderTasks();
-        }
+        // UI updates will happen on snapshot
+        li.classList.toggle('completed', checked);
     });
 
     // Delete Logic
@@ -201,13 +196,8 @@ function createTaskElement(task) {
                 message: 'Are you sure you want to delete this task? This action cannot be undone.',
                 confirmText: 'Delete',
                 onConfirm: () => {
-                    tasks = tasks.filter(t => t.id !== task.id);
-                    saveTasks();
-                    renderTasks();
-                    checkEmptyState();
-                    // Also update search view if active
-                    if (searchInput && searchInput.value) renderSearch(searchInput.value);
-                    showToast('Task deleted successfully', 'success');
+                   dbService.deleteTask(task.id);
+                   showToast('Task deleted successfully', 'success');
                 }
             });
         });

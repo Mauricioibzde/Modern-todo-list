@@ -1,5 +1,16 @@
+import { dbService } from '../services/db.js';
+
+let tasks = [];
+
+// Initialize
+dbService.onTasksSnapshot((updatedTasks) => {
+    tasks = updatedTasks;
+    updateDashboard();
+});
+
+
 export function updateDashboard() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    // const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     
     // 1. Basic Counts
     const totalTasks = tasks.length;

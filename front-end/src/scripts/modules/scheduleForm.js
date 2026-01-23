@@ -1,4 +1,5 @@
 import { showToast } from './notifications.js';
+import { dbService } from '../services/db.js';
 
 const form = document.querySelector('.add-schedule');
 const titleInput = document.querySelector('#schedule-title');
@@ -6,7 +7,7 @@ const descriptionInput = document.querySelector('#schedule-description');
 const dateInput = document.querySelector('#schedule-date');
 const timeInput = document.querySelector('#schedule-time');
 
-let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+// let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
 
 if (form) {
     form.addEventListener('submit', function(event) {
@@ -43,7 +44,7 @@ if (form) {
         // --- Validation End ---
 
         const newSchedule = {
-            id: Date.now(),
+            // id: Date.now(), // Auto-ID
             createdAt: new Date().toISOString(),
             title: titleValue,
             description: descriptionValue,
@@ -53,44 +54,47 @@ if (form) {
             completed: false
         };
 
-        schedules.push(newSchedule); 
-        saveSchedules();
-        console.log('Schedule Added:', newSchedule);
-
-        showToast("Schedule Created Successfully!", 'success');
+        dbService.addSchedule(newSchedule).then(() => {
+             console.log('Schedule Added');
+             showToast("Schedule Created Successfully!", 'success');
+             form.reset();
         
-        form.reset();
-        
-        // Reset the date picker trigger text if needed
-        const dateTriggerText = document.querySelector('#date-picker-trigger-schedule .text');
-        if (dateTriggerText) {
-            dateTriggerText.textContent = 'Select a date';
-        }
+             // Reset the date picker trigger text if needed
+             const dateTriggerText = document.querySelector('#date-picker-trigger-schedule .text');
+             if (dateTriggerText) {
+                 dateTriggerText.textContent = 'Select a date';
+             }
 
-        // Reset the time picker trigger text
-        const timeTriggerText = document.querySelector('#time-picker-trigger-schedule .text');
-        const timeTrigger = document.querySelector('#time-picker-trigger-schedule');
+             // Reset the time picker trigger text
+             const timeTriggerText = document.querySelector('#time-picker-trigger-schedule .text');
+             const timeTrigger = document.querySelector('#time-picker-trigger-schedule');
         
-        if (timeTriggerText) {
-            timeTriggerText.textContent = '00:00';
-        }
-        if (timeTrigger) {
-             timeTrigger.classList.remove('has-value');
-        }
+             if (timeTriggerText) {
+                 timeTriggerText.textContent = '00:00';
+                 timeTriggerText.classList.remove('has-value'); // Remove class if used for styling placeholder color
+             }
+             if (timeTrigger) {
+                  timeTrigger.classList.remove('has-value');
+             }
 
-        // Reset Category
-        if (categoryInput) {
-            categoryInput.value = '';
-            const selectedText = categoryInput.parentNode.querySelector('.select-selected');
-            if (selectedText) selectedText.textContent = 'Select Category';
-            const selectedItems = categoryInput.parentNode.querySelectorAll('.same-as-selected');
-            selectedItems.forEach(el => el.classList.remove('same-as-selected'));
-        }
+             // Reset Category
+             if (categoryInput) {
+                 categoryInput.value = '';
+                 const selectedText = categoryInput.parentNode.querySelector('.select-selected');
+                 if (selectedText) selectedText.textContent = 'Select Category';
+                 const selectedItems = categoryInput.parentNode.querySelectorAll('.same-as-selected');
+                 selectedItems.forEach(el => el.classList.remove('same-as-selected'));
+             }
+        }).catch(err => {
+            console.error(err);
+            showToast("Failed to create schedule", 'error');
+        });
     });
 }
-
+/*
 function saveSchedules() {
     localStorage.setItem('schedules', JSON.stringify(schedules));
     document.dispatchEvent(new CustomEvent('schedulesUpdated'));
 }
+*/
 

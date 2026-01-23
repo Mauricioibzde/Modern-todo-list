@@ -3,23 +3,21 @@ const scheduleListUl = document.querySelector('.list-schedules-ul');
 const noSchedulesMessage = document.querySelector('.no-schedules-message');
 import { showToast } from './notifications.js';
 import { showConfirmModal } from './modals.js';
+import { dbService } from '../services/db.js';
 
-let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+let schedules = [];
 
 export function initScheduleList() {
-    renderSchedules();
-    checkEmptyState();
+    // renderSchedules(); // Wait for data
+    // checkEmptyState();
 
-    // Listen for updates from other modules
-    document.addEventListener('schedulesUpdated', () => {
-        reloadSchedules();
+    // Listen for updates from DB
+    dbService.onSchedulesSnapshot((updatedSchedules) => {
+        schedules = updatedSchedules;
+        renderSchedules();
+        checkEmptyState();
+        document.dispatchEvent(new CustomEvent('schedulesUpdated'));
     });
-}
-
-function reloadSchedules() {
-    schedules = JSON.parse(localStorage.getItem('schedules')) || [];
-    renderSchedules();
-    checkEmptyState();
 }
 
 function renderSchedules() {
@@ -93,11 +91,9 @@ function createScheduleElement(schedule) {
     // Checkbox Logic (Toggle Completion)
     li.querySelector('.input-checkbox').addEventListener('change', (e) => {
         e.stopPropagation();
-        schedule.completed = e.target.checked;
-        saveSchedules();
-        li.classList.toggle('completed', schedule.completed);
-
-        // Optionally move to bottom or style differently
+        const checked = e.target.checked;
+        dbService.updateSchedule(task.id, { completed: checked }); // Assuming updateSchedule exists
+        li.classList.toggle('completed', checked);
     });
 
     // Delete Logic
@@ -110,10 +106,7 @@ function createScheduleElement(schedule) {
                 message: 'Are you sure you want to delete this schedule? This action cannot be undone.',
                 confirmText: 'Delete',
                 onConfirm: () => {
-                    schedules = schedules.filter(s => s.id !== schedule.id);
-                    saveSchedules();
-                    renderSchedules();
-                    checkEmptyState();
+                    dbService.deleteSchedule(schedule.id);
                     showToast('Schedule deleted successfully', 'success');
                 }
             });
@@ -122,13 +115,13 @@ function createScheduleElement(schedule) {
 
     return li;
 }
-
+/*
 function saveSchedules() {
     localStorage.setItem('schedules', JSON.stringify(schedules));
     // Dispatch event so other parts (like Dashboard if we add it later) know
     document.dispatchEvent(new CustomEvent('schedulesUpdated'));
 }
-
+*/
 function checkEmptyState() {
     if (!noSchedulesMessage) return;
     if (schedules.length === 0) {

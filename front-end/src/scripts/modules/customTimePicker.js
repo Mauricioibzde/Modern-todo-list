@@ -20,7 +20,11 @@ export class CustomTimePicker {
     }
 
     createDropdown() {
-        if (this.container.querySelector('.time-dropdown')) return;
+        const existingDropdown = this.container.querySelector('.time-dropdown');
+        if (existingDropdown) {
+            this.dropdown = existingDropdown;
+            return;
+        }
 
         this.dropdown = document.createElement('div');
         this.dropdown.classList.add('time-dropdown');
@@ -105,15 +109,9 @@ export class CustomTimePicker {
         const timeString = `${h}:${m}`;
         this.input.value = timeString;
         
-        // Update display input if it exists
-        const displayInput = this.trigger.querySelector('.time-display-input');
-        if (displayInput) {
-            displayInput.value = timeString;
-        } else {
-            // Fallback for old span structure if needed
-            const textSpan = this.trigger.querySelector('.text');
-            if (textSpan) textSpan.textContent = timeString;
-        }
+        // Update display text (span)
+        const textSpan = this.trigger.querySelector('.text');
+        if (textSpan) textSpan.textContent = timeString;
         
         this.trigger.classList.add('has-value');
 
@@ -135,41 +133,8 @@ export class CustomTimePicker {
     attachEvents() {
         this.trigger.addEventListener('click', (e) => {
             e.stopPropagation();
-            // Don't toggle if clicking the input (let it focus)
-            if (e.target.classList.contains('time-display-input')) return;
             this.toggleDropdown();
         });
-
-        const displayInput = this.trigger.querySelector('.time-display-input');
-        if (displayInput) {
-            // Input Masking
-            displayInput.addEventListener('input', (e) => {
-                let val = e.target.value.replace(/[^0-9:]/g, '');
-                
-                // Simple auto-colon if typing straight numbers
-                if (val.length === 2 && !val.includes(':') && e.inputType !== 'deleteContentBackward') {
-                    val += ':';
-                }
-                if (val.length > 5) val = val.slice(0, 5);
-                e.target.value = val;
-            });
-
-            displayInput.addEventListener('change', (e) => {
-                this.validateAndSetTime(e.target.value);
-            });
-
-            displayInput.addEventListener('blur', (e) => {
-                this.validateAndSetTime(e.target.value);
-            });
-
-            displayInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    this.validateAndSetTime(e.target.value);
-                    displayInput.blur();
-                    this.closeDropdown();
-                }
-            });
-        }
 
         // Close when clicking outside
         document.addEventListener('click', (e) => {

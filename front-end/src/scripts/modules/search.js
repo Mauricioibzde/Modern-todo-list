@@ -1,6 +1,7 @@
 
 import { showToast } from './notifications.js';
 import { showConfirmModal } from './modals.js';
+import { dbService } from '../services/db.js';
 
 let tasks = [];
 let schedules = [];
@@ -28,12 +29,12 @@ export function initSearch() {
     populateCategoryFilter();
 
     // Listen for updates from other modules
-    document.addEventListener('tasksUpdated', refreshSearch);
-    document.addEventListener('schedulesUpdated', refreshSearch);
+    // document.addEventListener('tasksUpdated', refreshSearch);
+    // document.addEventListener('schedulesUpdated', refreshSearch);
 }
 
 function refreshSearch() {
-    loadData();
+    // loadData(); // Data is loaded via snapshot
     populateCategoryFilter();
     // Only perform search if there is a term or filter is active, or just always update if the User is looking at the search screen?
     // If the user is on the search screen, we should update the results.
@@ -42,8 +43,17 @@ function refreshSearch() {
 }
 
 function loadData() {
-    tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+    // tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    // schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+    
+    dbService.onTasksSnapshot(data => {
+        tasks = data;
+        refreshSearch();
+    });
+    dbService.onSchedulesSnapshot(data => {
+        schedules = data;
+        refreshSearch();
+    });
 }
 
 function setupEventListeners() {

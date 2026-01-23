@@ -1,5 +1,6 @@
 import dayjs from 'https://cdn.jsdelivr.net/npm/dayjs@1.11.10/+esm';
 import { showDayDetailsModal } from './modals.js';
+import { dbService } from '../services/db.js';
 
 export class Calendar {
     /**
@@ -9,6 +10,18 @@ export class Calendar {
     constructor(optionsOrTrigger, inputSelector) {
         this.currentDate = dayjs();
         this.selectedDate = null;
+        this.tasks = [];
+        this.schedules = [];
+
+        // Subscribe to data
+        dbService.onTasksSnapshot((data) => {
+            this.tasks = data;
+            this.renderCalendar();
+        });
+        dbService.onSchedulesSnapshot((data) => {
+            this.schedules = data;
+            this.renderCalendar();
+        });
 
         if (typeof optionsOrTrigger === 'string') {
             // Legacy mode: (trigger, input)
@@ -169,8 +182,10 @@ export class Calendar {
         this.monthDisplay.textContent = this.currentDate.format('MMMM YYYY');
 
         // Fetch data for counts
-        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+        // const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        // const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+        const tasks = this.tasks;
+        const schedules = this.schedules;
 
         const dayElements = this.grid.querySelectorAll('.calendar-day');
         dayElements.forEach(el => el.remove());
@@ -286,11 +301,11 @@ export class Calendar {
         } else {
             // Inline mode: Show details modal
             const dateStr = date.format('YYYY-MM-DD');
-            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-            const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
-
-            const dayTasks = tasks.filter(t => t.dueDate === dateStr).map(t => ({...t, type: 'task'}));
-            const daySchedules = schedules.filter(s => s.date === dateStr).map(s => ({...s, type: 'schedule'}));
+            // const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            // const schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+            
+            const dayTasks = this.tasks.filter(t => t.dueDate === dateStr).map(t => ({...t, type: 'task'}));
+            const daySchedules = this.schedules.filter(s => s.date === dateStr).map(s => ({...s, type: 'schedule'}));
             
             const allItems = [...dayTasks, ...daySchedules];
             
