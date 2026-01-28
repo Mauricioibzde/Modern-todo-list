@@ -17,10 +17,12 @@
     
     /* --- Backgrounds --- */
     --bg-main: #f0f2f5;                 /* Light Gray Background */
-    --bg-secondary: #ffffff;            /* White (Forms/Cards) */
+    --bg-secondary: #ffffff;  
+     --bg-third: #fce3e3;
+     --bd-li:  #fb919f;              /* White (Forms/Cards) */
     --bg-tertiary: #f8fafc;             /* Very light gray for lists */
     --bg-btn-dark: #e2e8f0;             /* Light Button Background */
-    
+   
     /* Gradients */
     --bg-gradient-start: #f8fafc;
     --bg-gradient-end: #f1f5f9;

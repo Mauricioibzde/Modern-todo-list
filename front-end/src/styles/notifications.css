@@ -1,9 +1,88 @@
+.toast-reminder-label {
+    display: block;
+    text-align: center;
+    font-size: 1em;
+    color: var(--color-warning);
+    font-weight: 700;
+    margin-top: 2px;
+    margin-bottom: 0;
+    letter-spacing: 0.5px;
+}
+.toast-top-row {
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 4px;
+}
+.toast-icon-top {
+
+    width: auto;
+    margin-bottom: 0;
+    margin-top: 2px;
+}
+.toast-icon-top svg {
+    width: 32px;
+    height: 32px;
+}
+.toast-close {
+    align-self: flex-start;
+    margin-left: auto;
+    margin-top: 2px;
+    margin-right: 0;
+    z-index: 1;
+}
+
+.toast-message {
+    display: block;
+    font-size: 0.97em;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+    text-align: left;
+    word-break: break-word;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.toast-counts-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin: 6px 0 0 0;
+    font-size: 1.08em;
+    width: 100%;
+    justify-content: center;
+    font-weight: 600;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    padding: 2px 0;
+    box-shadow: 0 1px 4px var(--hover-overlay-light);
+}
+.toast-task-count, .toast-schedule-count {
+ 
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1em;
+    display: inline-block;
+}
+.toast-task-count {
+    color: var(--color-success);
+    font-weight: 700;
+}
+.toast-schedule-count {
+    color: var(--color-warning);
+    font-weight: 700;
+}
 .notification-item-link {
     cursor: pointer;
     border-radius: 10px;
     transition: background 0.2s, box-shadow 0.2s;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    background: #0039ff0d;
+    
 }
 .notification-item-link:hover, .notification-item-link:focus {
     background: var(--hover-overlay-light, #f3f4f6);
@@ -17,48 +96,51 @@
 }
 .highlight-notification {
     animation: highlight-notification-blink 2.2s 1;
-    background: #fff !important;
+    background: var(--highlight-bg, #e5e7eb) !important;
+    transition: background 0.3s;
 }
+
 @keyframes highlight-notification-blink {
-    0%   { background: #fff; }
-    20%  { background: #fff; }
-    30%  { background: #ffe066; }
-    40%  { background: #fff; }
-    60%  { background: #fff; }
-    70%  { background: #ffe066; }
-    80%  { background: #fff; }
-    100% { background: #fff; }
+    0%   { background: var(--highlight-bg, #e5e7eb); }
+    20%  { background: var(--highlight-bg, #e5e7eb); }
+    30%  { background: var(--highlight-bg2, #f3f4f6); }
+    40%  { background: var(--highlight-bg, #e5e7eb); }
+    60%  { background: var(--highlight-bg, #e5e7eb); }
+    70%  { background: var(--highlight-bg2, #f3f4f6); }
+    80%  { background: var(--highlight-bg, #e5e7eb); }
+    100% { background: var(--highlight-bg, #e5e7eb); }
 }
 #toast-container {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10000;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 10px;
     pointer-events: none; /* Let clicks pass through container area */
 }
 
 .toast {
     pointer-events: auto;
-    background-color: var(--bg-secondary);
+
     color: var(--text-primary);
     border: 1px solid var(--border-dim);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 15px -3px var(--hover-overlay-medium), 0 4px 6px -2px var(--hover-overlay-light);
     border-radius: 12px;
     padding: 1rem;
     min-width: 300px;
     max-width: 400px;
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
     opacity: 0;
     transform: translateX(100%);
     transition:
    opacity 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55),
    transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-
     position: relative;
     overflow: hidden;
 }
@@ -68,10 +150,19 @@
     transform: translateX(0);
 }
 
-.toast-icon {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
+.toast-icon-top {
+ 
+    width: 100%;
+
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    
+}
+.toast-icon-top svg {
+    width: 32px;
+    height: 32px;
 }
 
 .toast.hide {
@@ -105,6 +196,7 @@
     padding: 0;
     margin-left: 8px;
     transition: color 0.2s;
+    align-self: flex-start;
 }
 
 .toast-close:hover {
@@ -114,6 +206,10 @@
 /* Types */
 .toast.success {
     border-left: 4px solid var(--color-success);
+}
+
+.toast-icon {
+    align-self: flex-start;
 }
 .toast.success .toast-icon {
     color: var(--color-success);
@@ -126,8 +222,18 @@
     color: var(--color-danger);
 }
 
-.toast.warning {
+.toast.warning  {
+    display: flex;
+    flex-direction: column;
     border-left: 4px solid var(--color-warning);
+
+    & h4 {
+        display: block;
+    }
+}
+
+.toast.warning > * {
+    margin: 0!important;
 }
 .toast.warning .toast-icon {
     color: var(--color-warning);
@@ -225,28 +331,35 @@
 
 .notification-item-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     align-items: center;
+    gap: 0.25rem;
+    justify-content: flex-start;
+    min-height: 28px;
 }
 
 .notification-item-title {
-
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--text-primary);
-
     display: flex;
-    gap: .3rem;
+    align-items: center;
+    gap: 0.2rem;
 }
 
 .notification-item-tag {
     font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 12px;
+    padding: 1px 7px;
+    border-radius: 10px;
     background-color: var(--bg-tertiary);
     color: var(--text-secondary);
     text-transform: uppercase;
     font-weight: 600;
+    margin-left: 0.15rem;
+    display: flex;
+    align-items: center;
+    height: 20px;
+    line-height: 1;
 }
 
 .notification-item-tag.task { background-color: rgba(16, 185, 129, 0.1); color: var(--color-success); }
@@ -265,4 +378,126 @@
     display: flex;
     align-items: center;
     gap: 4px;
+}
+
+/*
+ * === TROQUE AS CORES DO DESTAQUE DO REMINDER AQUI ===
+ * Basta editar os valores das variáveis abaixo para personalizar o highlight.
+ *
+ * MODO CLARO:
+ */
+:root[data-theme="light"] {
+    --highlight-bg: #e5e7eb;   /* <- Cor principal do destaque no modo claro */
+    --highlight-bg2: #f3f4f6;  /* <- Cor secundária do destaque no modo claro */
+    --highlight-border: #6366f1; /* <- Cor do contorno/foco no modo claro (indigo-500) */
+
+     & .schedule-item {
+        background-color: var(--bg-third) !important;
+    }
+}
+
+/*
+ * MODO ESCURO:
+ */
+:root[data-theme="dark"] {
+    --highlight-bg: #23272e;   /* <- Cor principal do destaque no modo escuro */
+    --highlight-bg2: #2d323b;  /* <- Cor secundária do destaque no modo escuro */
+    --highlight-border: #6366f1; /* <- Cor do contorno/foco no modo escuro (pode ser igual ou diferente) */
+
+    & .schedule-item {
+        background-color: var(--bg-secondary) !important;
+    }
+}
+
+.highlight-notification, .task-item:focus, .task-item.selected {
+    animation: highlight-notification-blink 2.2s 1;
+    background: var(--highlight-bg);
+    border: 1px solid var(--highlight-border);
+    box-shadow: 0 0 20px 0px var(--highlight-border, #e1e1e1), 0 1px 5px rgba(179, 179, 179, 0.382);
+    transition: background 0.3s, border 0.3s, box-shadow 0.3s;
+    z-index: 2;
+}
+
+@keyframes highlight-notification-blink {
+    0%   { background: var(--highlight-bg, #e5e7eb); }
+    20%  { background: var(--highlight-bg, #e5e7eb); }
+    30%  { background: var(--highlight-bg2, #f3f4f6); }
+    40%  { background: var(--highlight-bg, #e5e7eb); }
+    60%  { background: var(--highlight-bg, #e5e7eb); }
+    70%  { background: var(--highlight-bg2, #f3f4f6); }
+    80%  { background: var(--highlight-bg, #e5e7eb); }
+    100% { background: var(--highlight-bg, #e5e7eb); }
+}
+
+.notification-item-link {
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+
+}
+
+/*
+ * MODO CLARO: fundo bem claro, contraste suave
+ */
+:root[data-theme="light"] {
+    --notification-link-bg: #f8e8e8; /* Tom rosa claro, visível e suave para listas */
+
+    & .notification-item-link {
+        background-color: var(--notification-link-bg);
+    }
+
+     & .notification-item-link:hover {
+        background-color: #fdb1bb;
+    }
+
+      
+  
+    
+        li {
+            width: 100%;
+              box-shadow: 2px 0 0 0 var(--bd-li);
+            max-width: 600px;
+            min-width: 200px;
+            margin: 0 auto 1rem auto;
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            padding: 1rem;
+           
+            transition: all 0.3s ease;
+
+            span {
+                color: #23272e;
+            }
+            /* Fundo padrão, será sobrescrito por tema */
+          
+
+            
+            &.focused {
+                background: var(--focus-overlay-primary); 
+                border-radius: 0.5rem;
+                border-bottom-color: transparent; 
+                
+               
+            }
+}
+
+.delete-button {
+    background-color: var(--bd-li);
+}
+
+.name-task {
+    align-items: center;
+}
+}
+/*
+ * MODO ESCURO: fundo cinza escuro, contraste forte
+ */
+:root[data-theme="dark"] {
+    --notification-link-bg: #2a2d34;
+
+    li {
+    box-shadow: 2px 0 0 0 var(--color-primary);
+}
 }

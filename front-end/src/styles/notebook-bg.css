@@ -55,7 +55,6 @@ input,
 select, 
 textarea,
 .task-item,
-.schedule-item,
 .insight-item,
 .chart-container {
      background-color: var(--bg-secondary) !important;

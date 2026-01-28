@@ -156,15 +156,18 @@ function notifyUpcoming(items) {
     { task: 0, schedule: 0 }
   );
 
-  const parts = [];
-  if (counts.task)
-    parts.push(`${counts.task} task${counts.task > 1 ? 's' : ''} due soon`);
-  if (counts.schedule)
-    parts.push(`${counts.schedule} schedule${counts.schedule > 1 ? 's' : ''} coming up`);
 
-  const message = `Reminder: ${parts.join(' and ')} within ${REMINDER_CONFIG.DAYS_AHEAD} days.`;
 
+
+  // Sempre mostra ambos os números, mesmo que um deles seja zero
+  const message = `<div class="toast-counts-row"><span class="toast-task-count">${counts.task} task${counts.task === 1 ? '' : 's'}</span><span class="toast-schedule-count">${counts.schedule} schedule${counts.schedule === 1 ? '' : 's'}</span></div>due within ${REMINDER_CONFIG.DAYS_AHEAD} days.`;
+
+  // Evita múltiplos toasts em sequência (mesmo mudando a contagem)
+  if (notifyUpcoming.toastActive) return;
+  notifyUpcoming.toastActive = true;
   showToast(message, 'warning', 'Upcoming Deadlines');
+  // Esta linha desativa o bloqueio e permite que novas notificações apareçam após 2,5s
+  setTimeout(() => { notifyUpcoming.toastActive = false; }, 2500);
 }
 
 /* ======================================================

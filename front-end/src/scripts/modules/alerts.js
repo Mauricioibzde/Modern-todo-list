@@ -75,12 +75,16 @@ function createToastElement({ message, type, title }) {
   toast.dataset.message = message;
 
   toast.innerHTML = `
-    <div class="toast-icon">${TOAST_TYPES[type].icon}</div>
-    <div class="toast-content">
-      <h4 class="toast-title">${title}</h4>
-      <p class="toast-message">${message.replace(/\n/g, '<br>')}</p>
+    <div class="toast-top-row">
+      <div class="toast-icon toast-icon-top">${TOAST_TYPES[type].icon}
+       ${type === 'warning' ? '<span class="toast-reminder-label">Reminder</span>' : ''}
+      </div>
+
+      <button class="toast-close" aria-label="Close notification">✕</button>
     </div>
-    <button class="toast-close" aria-label="Close notification">✕</button>
+   
+    <div class="toast-message">${message.replace(/\n/g, '<br>')}</div>
+   
     <div class="toast-progress"></div>
   `;
 
@@ -129,12 +133,20 @@ export function showToast(message, type = 'success', customTitle) {
   const toastType = TOAST_TYPES[type] ? type : 'success';
   const title = customTitle || TOAST_TYPES[toastType].title;
 
-  // Remove toasts duplicados (mesma mensagem)
-  [...container.children].forEach(existingToast => {
-    if (existingToast.dataset.message === message) {
-      removeToast(existingToast);
-    }
+  // Normaliza mensagem para evitar duplicidade por espaços/linhas
+  const normalizedMsg = message.replace(/\s+/g, ' ').trim();
+
+  // Bloqueia exibição se já houver toast igual (mesmo título, tipo e mensagem normalizada)
+  const alreadyVisible = [...container.children].some(existingToast => {
+    const existingMsg = (existingToast.dataset.message || '').replace(/\s+/g, ' ').trim();
+    const existingTitle = existingToast.querySelector('.toast-title')?.textContent?.trim() || '';
+    return (
+      existingMsg === normalizedMsg &&
+      existingTitle === title &&
+      existingToast.classList.contains('show')
+    );
   });
+  if (alreadyVisible) return;
 
   // Limita quantidade máxima
   if (container.childElementCount >= TOAST_CONFIG.maxToasts) {
