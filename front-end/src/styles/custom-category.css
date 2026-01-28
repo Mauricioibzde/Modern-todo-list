@@ -174,8 +174,10 @@
 }
 
 .modal-actions {
+    margin-top: 1rem;
     display: flex;
     justify-content: flex-end;
+    gap: .5rem;
     gap: 10px;
 }
 

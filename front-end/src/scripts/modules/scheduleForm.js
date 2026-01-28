@@ -1,5 +1,9 @@
-import { showToast } from './notifications.js';
+import { showToast } from './alerts.js';
 import { dbService } from '../services/db.js';
+
+/* ======================================================
+   DOM REFERENCES
+====================================================== */
 
 const form = document.querySelector('.add-schedule');
 const titleInput = document.querySelector('#schedule-title');
@@ -7,94 +11,126 @@ const descriptionInput = document.querySelector('#schedule-description');
 const dateInput = document.querySelector('#schedule-date');
 const timeInput = document.querySelector('#schedule-time');
 
-// let schedules = JSON.parse(localStorage.getItem('schedules')) || [];
+/* ======================================================
+   INIT
+====================================================== */
 
 if (form) {
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
+  form.addEventListener('submit', handleSubmit);
+}
 
-        // --- Validation Start ---
-        const categoryInput = document.querySelector('#schedule-category');
-        const titleValue = titleInput.value.trim();
-        const descriptionValue = descriptionInput.value.trim();
-        const dateValue = dateInput.value;
-        const timeValue = timeInput.value;
-        const categoryValue = categoryInput.value;
+/* ======================================================
+   SUBMIT HANDLER
+====================================================== */
 
-        const errors = [];
+function handleSubmit(e) {
+  e.preventDefault();
 
-        if (!titleValue) {
-            errors.push("Title is required.");
-        } else if (titleValue.length < 3) {
-            errors.push("Title must be at least 3 characters long.");
-        }
+  const categoryInput = document.querySelector('#schedule-category');
 
-        if (!dateValue) {
-            errors.push("Date is required.");
-        }
+  const formData = {
+    title: titleInput.value.trim(),
+    description: descriptionInput.value.trim(),
+    date: dateInput.value,
+    time: timeInput.value,
+    category: categoryInput?.value || 'Uncategorized'
+  };
 
-        if (!timeValue) {
-            errors.push("Time is required.");
-        }
+  const errors = validateSchedule(formData);
+  if (errors.length) {
+    showToast(
+      `Please fix the following errors:\n- ${errors.join('\n- ')}`,
+      'error'
+    );
+    return;
+  }
 
-        if (errors.length > 0) {
-            showToast("Please fix the following errors:\n- " + errors.join("\n- "), 'error');
-            return; // Stop submission
-        }
-        // --- Validation End ---
+  const newSchedule = buildSchedule(formData);
 
-        const newSchedule = {
-            // id: Date.now(), // Auto-ID
-            createdAt: new Date().toISOString(),
-            title: titleValue,
-            description: descriptionValue,
-            date: dateValue,
-            time: timeValue,
-            category: categoryValue || 'Uncategorized',
-            completed: false
-        };
-
-        dbService.addSchedule(newSchedule).then(() => {
-             console.log('Schedule Added');
-             showToast("Schedule Created Successfully!", 'success');
-             form.reset();
-        
-             // Reset the date picker trigger text if needed
-             const dateTriggerText = document.querySelector('#date-picker-trigger-schedule .text');
-             if (dateTriggerText) {
-                 dateTriggerText.textContent = 'Select a date';
-             }
-
-             // Reset the time picker trigger text
-             const timeTriggerText = document.querySelector('#time-picker-trigger-schedule .text');
-             const timeTrigger = document.querySelector('#time-picker-trigger-schedule');
-        
-             if (timeTriggerText) {
-                 timeTriggerText.textContent = '00:00';
-                 timeTriggerText.classList.remove('has-value'); // Remove class if used for styling placeholder color
-             }
-             if (timeTrigger) {
-                  timeTrigger.classList.remove('has-value');
-             }
-
-             // Reset Category
-             if (categoryInput) {
-                 categoryInput.value = '';
-                 const selectedText = categoryInput.parentNode.querySelector('.select-selected');
-                 if (selectedText) selectedText.textContent = 'Select Category';
-                 const selectedItems = categoryInput.parentNode.querySelectorAll('.same-as-selected');
-                 selectedItems.forEach(el => el.classList.remove('same-as-selected'));
-             }
-        }).catch(err => {
-            console.error(err);
-            showToast("Failed to create schedule", 'error');
-        });
+  dbService
+    .addSchedule(newSchedule)
+    .then(() => {
+      showToast('Schedule Created Successfully!', 'success');
+      resetForm(categoryInput);
+    })
+    .catch(err => {
+      console.error(err);
+      showToast('Failed to create schedule', 'error');
     });
 }
-/*
-function saveSchedules() {
-    localStorage.setItem('schedules', JSON.stringify(schedules));
-    document.dispatchEvent(new CustomEvent('schedulesUpdated'));
-}
-*/
 
+/* ======================================================
+   VALIDATION
+====================================================== */
+
+function validateSchedule({ title, date, time }) {
+  const errors = [];
+
+  if (!title) errors.push('Title is required.');
+  else if (title.length < 3)
+    errors.push('Title must be at least 3 characters long.');
+
+  if (!date) errors.push('Date is required.');
+  if (!time) errors.push('Time is required.');
+
+  return errors;
+}
+
+/* ======================================================
+   BUILD DATA
+====================================================== */
+
+function buildSchedule(data) {
+  return {
+    ...data,
+    createdAt: new Date().toISOString(),
+    completed: false
+  };
+}
+
+/* ======================================================
+   UI RESET
+====================================================== */
+
+function resetForm(categoryInput) {
+  form.reset();
+  resetDatePicker();
+  resetTimePicker();
+  resetCategorySelect(categoryInput);
+}
+
+function resetDatePicker() {
+  const triggerText =
+    document.querySelector('#date-picker-trigger-schedule .text');
+
+  if (triggerText) {
+    triggerText.textContent = 'Select a date';
+  }
+}
+
+function resetTimePicker() {
+  const trigger =
+    document.querySelector('#time-picker-trigger-schedule');
+  const triggerText = trigger?.querySelector('.text');
+
+  if (triggerText) {
+    triggerText.textContent = '00:00';
+  }
+
+  trigger?.classList.remove('has-value');
+}
+
+function resetCategorySelect(categoryInput) {
+  if (!categoryInput) return;
+
+  categoryInput.value = '';
+
+  const wrapper = categoryInput.parentNode;
+  wrapper
+    ?.querySelector('.select-selected')
+    ?.replaceChildren(document.createTextNode('Select Category'));
+
+  wrapper
+    ?.querySelectorAll('.same-as-selected')
+    .forEach(el => el.classList.remove('same-as-selected'));
+}

@@ -1,86 +1,128 @@
+/* ======================================================
+   NAVIGATION INITIALIZER
+====================================================== */
+
 export function initNavigation() {
-    const navItems = {
-        'nav-create-task': '.create-task',
-        'nav-dashboard': '.dashboard',
-        'nav-list-tasks': '.list-tasks',
-        'nav-all-tasks': '.list-tasks',
-        'nav-search': '.search',
-        'nav-insights': '.dashboard',
-        'nav-calendar': '.calendar-view',
-        'nav-create-schedule': '.create-schedule',
-        'nav-all-schedules': '.list-schedules'
+
+  /* ======================================================
+     ROUTE CONFIG
+     Mapeia menu → section
+  ====================================================== */
+  const ROUTES = {
+    'nav-create-task': '.create-task',
+    'nav-dashboard': '.dashboard',
+    'nav-list-tasks': '.list-tasks',
+    'nav-all-tasks': '.list-tasks',
+    'nav-search': '.search',
+    'nav-insights': '.dashboard',
+    'nav-calendar': '.calendar-view',
+    'nav-create-schedule': '.create-schedule',
+    'nav-all-schedules': '.list-schedules'
+  };
+
+  /* ======================================================
+     DOM CACHE
+  ====================================================== */
+  const sections = document.querySelectorAll('main > section');
+  const menuItems = document.querySelectorAll('.menu .item');
+
+  /* ======================================================
+     FILTER DISPATCHER
+     Comunicação desacoplada com task list
+  ====================================================== */
+  function dispatchTaskFilter(filter) {
+    document.dispatchEvent(
+      new CustomEvent('filterTasks', { detail: { filter } })
+    );
+  }
+
+  /* ======================================================
+     ROUTE SIDE EFFECTS
+     Regras específicas por rota
+  ====================================================== */
+  function handleRouteSideEffects(routeId) {
+    const filters = {
+      'nav-list-tasks': 'pending',
+      'nav-all-tasks': 'all'
     };
 
-    const sections = document.querySelectorAll('main > section');
-    const menuItems = document.querySelectorAll('.menu .item');
-
-    // Import filter function dynamically or dispatch event
-    // For simplicity, we'll dispatch an event meant for other modules (like form.js/taskList.js)
-    function dispatchFilterEvent(filterType) {
-        const event = new CustomEvent('filterTasks', { detail: { filter: filterType } });
-        document.dispatchEvent(event);
+    if (filters[routeId]) {
+      dispatchTaskFilter(filters[routeId]);
     }
+  }
 
-    function setActiveSection(targetId) {
-        // Handle specific logic (Filter)
-        if (targetId === 'nav-list-tasks') {
-            dispatchFilterEvent('pending');
-        } else if (targetId === 'nav-all-tasks') {
-            dispatchFilterEvent('all');
-        }
+  /* ======================================================
+     SECTION VISIBILITY
+  ====================================================== */
+  function hideAllSections() {
+    sections.forEach(section =>
+      section.classList.add('hidden')
+    );
+  }
 
-        // Hide all sections
-        sections.forEach(section => {
-            section.classList.add('hidden');
-        });
+  function showSectionByRoute(routeId) {
+    const selector = ROUTES[routeId];
+    if (!selector) return;
 
-        // Show target section
-        const targetSelector = navItems[targetId];
-        if (targetSelector) {
-            const targetSection = document.querySelector(targetSelector);
-            if (targetSection) {
-                targetSection.classList.remove('hidden');
-            }
-        }
+    const section = document.querySelector(selector);
+    section?.classList.remove('hidden');
+  }
 
-        // Update active menu state
-        menuItems.forEach(item => {
-            if (item.id === targetId) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
-        
-        // Save current view
-        localStorage.setItem('currentView', targetId);
+  /* ======================================================
+     MENU STATE
+  ====================================================== */
+  function updateMenuActiveState(routeId) {
+    menuItems.forEach(item =>
+      item.classList.toggle('active', item.id === routeId)
+    );
+  }
+
+  /* ======================================================
+     MOBILE SIDEBAR HANDLING
+  ====================================================== */
+  function closeSidebarOnMobile() {
+    if (window.innerWidth > 768) return;
+
+    const sidebar = document.querySelector('.sidebar');
+    const main = document.querySelector('main');
+
+    if (sidebar?.classList.contains('active')) {
+      sidebar.classList.remove('active');
+      main?.classList.remove('sidebar-closed');
     }
+  }
 
-    // Attach click events
-    Object.keys(navItems).forEach(id => {
-        const link = document.getElementById(id);
-        if (link) {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                setActiveSection(id);
+  /* ======================================================
+     CORE ROUTE HANDLER
+  ====================================================== */
+  function navigate(routeId) {
+    handleRouteSideEffects(routeId);
+    hideAllSections();
+    showSectionByRoute(routeId);
+    updateMenuActiveState(routeId);
 
-                // Auto-close sidebar on mobile
-                if (window.innerWidth <= 768) {
-                    const sideBar = document.querySelector('.sidebar');
-                    const mainContent = document.querySelector('main');
-                    
-                    // On mobile, 'active' class means the sidebar is OPEN (visible).
-                    // We want to remove it to close the sidebar.
-                    if (sideBar && sideBar.classList.contains('active')) {
-                        sideBar.classList.remove('active');
-                        if (mainContent) mainContent.classList.remove('sidebar-closed');
-                    }
-                }
-            });
-        }
+    localStorage.setItem('currentView', routeId);
+  }
+
+  /* ======================================================
+     EVENT BINDING
+  ====================================================== */
+  Object.keys(ROUTES).forEach(routeId => {
+    const link = document.getElementById(routeId);
+    if (!link) return;
+
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      navigate(routeId);
+      closeSidebarOnMobile();
     });
+  });
 
-    // Initialize with saved view or default to dashboard
-    const savedView = localStorage.getItem('currentView') || 'nav-dashboard';
-    setActiveSection(savedView);
+  /* ======================================================
+     INITIAL LOAD
+  ====================================================== */
+  const savedRoute =
+    localStorage.getItem('currentView') || 'nav-dashboard';
+
+  navigate(savedRoute);
 }

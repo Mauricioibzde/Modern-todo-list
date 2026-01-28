@@ -1,3 +1,34 @@
+.notification-item-link {
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    background: #0039ff0d;
+}
+.notification-item-link:hover, .notification-item-link:focus {
+    background: var(--hover-overlay-light, #f3f4f6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    outline: none;
+}
+.notification-item-category {
+    font-size: 0.82rem;
+    color: var(--color-primary);
+    margin-bottom: 2px;
+}
+.highlight-notification {
+    animation: highlight-notification-blink 2.2s 1;
+    background: #fff !important;
+}
+@keyframes highlight-notification-blink {
+    0%   { background: #fff; }
+    20%  { background: #fff; }
+    30%  { background: #ffe066; }
+    40%  { background: #fff; }
+    60%  { background: #fff; }
+    70%  { background: #ffe066; }
+    80%  { background: #fff; }
+    100% { background: #fff; }
+}
 #toast-container {
     position: fixed;
     top: 20px;
@@ -24,7 +55,10 @@
     gap: 12px;
     opacity: 0;
     transform: translateX(100%);
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transition:
+   opacity 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+   transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
     position: relative;
     overflow: hidden;
 }
@@ -39,6 +73,12 @@
     width: 24px;
     height: 24px;
 }
+
+.toast.hide {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
 
 .toast-content {
     flex-grow: 1;
@@ -157,9 +197,12 @@
     max-height: 80vh;
     display: flex;
     flex-direction: column;
+    gap: .5rem;
 }
 
 .notification-list {
+    display: grid;
+    gap: .5rem;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -187,9 +230,13 @@
 }
 
 .notification-item-title {
+
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--text-primary);
+
+    display: flex;
+    gap: .3rem;
 }
 
 .notification-item-tag {
@@ -203,11 +250,11 @@
 }
 
 .notification-item-tag.task { background-color: rgba(16, 185, 129, 0.1); color: var(--color-success); }
-.notification-item-tag.schedule { background-color: rgba(59, 130, 246, 0.1); color: var(--color-primary); }
+.notification-item-tag.schedule { background-color: rgba(59, 130, 246, 0.1); color: var(--color-secondary); }
 
 .notification-item-info {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--color-secondary);
 }
 
 .notification-item-due {

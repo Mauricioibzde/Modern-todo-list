@@ -1,236 +1,257 @@
 import { updateDashboard } from './dashboard.js';
-import { showToast } from './notifications.js';
+import { showToast } from './alerts.js';
 import { showConfirmModal } from './modals.js';
 import { dbService } from '../services/db.js';
+
+/* ======================================================
+   DOM REFERENCES
+====================================================== */
 
 const form = document.querySelector('.add-task');
 const titleInput = document.querySelector('#title');
 const descriptionInput = document.querySelector('#description');
 const dateInput = document.querySelector('#due-date');
-const taskListUl = document.querySelector('.list-tasks .list-tasks-ul'); // Specific selector to avoid conflict
+const taskListUl = document.querySelector('.list-tasks .list-tasks-ul');
 const noTasksMessage = document.querySelector('.no-tasks-message');
-// Search logic moved to search.js
 
-let tasks = []; // Will be synced from DB
-let currentFilter = 'pending'; // 'all', 'pending'
+/* ======================================================
+   STATE
+====================================================== */
 
-// Initialize
-// Subscribe to real-time updates
-dbService.onTasksSnapshot((updatedTasks) => {
-    tasks = updatedTasks;
-    renderTasks();
-    checkEmptyState();
-    updateDashboard(); // Updates global counts
-    // LocalStorage fallback for non-DB parts? No, fully switch.
-    document.dispatchEvent(new CustomEvent('tasksUpdated'));
+let tasks = [];
+let currentFilter = 'pending'; // 'pending' | 'all'
+
+/* ======================================================
+   INIT — REALTIME SYNC
+====================================================== */
+
+dbService.onTasksSnapshot(updatedTasks => {
+  tasks = updatedTasks;
+
+  renderTasks();
+  updateEmptyState();
+  updateDashboard(tasks);
+
+  // Notify other modules (search, calendar, etc.)
+  document.dispatchEvent(
+    new CustomEvent('tasksUpdated', { detail: tasks })
+  );
 });
 
-// Event listener for navigation filters
-document.addEventListener('filterTasks', (e) => {
-    currentFilter = e.detail.filter;
-    renderTasks();
-    
-    // Update header title based on filter
-    const listHeader = document.querySelector('.list-tasks h1');
-    if (listHeader) {
-        listHeader.textContent = currentFilter === 'all' ? 'All Tasks' : 'Pending Tasks';
-    }
+/* ======================================================
+   FILTER EVENTS
+====================================================== */
+
+document.addEventListener('filterTasks', e => {
+  currentFilter = e.detail.filter;
+  renderTasks();
+  updateListHeader();
 });
+
+/* ======================================================
+   FORM SUBMISSION
+====================================================== */
 
 if (form) {
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        // Select the category input which is dynamically created
-        const categoryInput = document.querySelector('#task-category');
-        
-        // --- Validation Start ---
-        const titleValue = titleInput.value.trim();
-        const descriptionValue = descriptionInput.value.trim();
-        const dateValue = dateInput.value;
-        const categoryValue = categoryInput ? categoryInput.value : '';
-
-        const errors = [];
-
-        if (!titleValue) {
-            errors.push("Title is required.");
-        } else if (titleValue.length < 3) {
-            errors.push("Title must be at least 3 characters long.");
-        }
-
-        if (!dateValue) {
-            errors.push("Due date is required.");
-        }
-
-        if (errors.length > 0) {
-            showToast("Please fix the following errors:\n- " + errors.join("\n- "), 'error', 'Validation Failed');
-            return; // Stop submission
-        }
-        // --- Validation End ---
-
-        const newTask = {
-            // id: Date.now(), // Firestore generates ID
-            createdAt: new Date().toISOString(),
-            completedAt: null,
-            title: titleValue,
-            description: descriptionValue,
-            dueDate: dateValue,
-            category: categoryValue || 'Uncategorized',
-            completed: false
-        };
-
-        // tasks.push(newTask); 
-        // saveTasks();
-        dbService.addTask(newTask).then(() => {
-            console.log('Task Added');
-            showToast("Task created successfully!", 'success');
-             form.reset();
-        
-            // Reset the visual custom select
-            const selectedDiv = document.querySelector('.select-selected');
-            if (selectedDiv) {
-                selectedDiv.textContent = 'Select Category';
-                // Also clear the hidden input value
-                if (categoryInput) categoryInput.value = '';
-            }
-        }).catch(err => {
-            console.error(err);
-            showToast("Error creating task", 'error');
-        });
-
-        // Optimistic UI or wait for snapshot? Snapshot is fast enough usually.
-        // checkEmptyState(); // Will be handled by snapshot
-        
-       
-
-    });
+  form.addEventListener('submit', handleFormSubmit);
 }
 
+function handleFormSubmit(e) {
+  e.preventDefault();
+
+  const categoryInput = document.querySelector('#task-category');
+
+  const formData = {
+    title: titleInput.value.trim(),
+    description: descriptionInput.value.trim(),
+    dueDate: dateInput.value,
+    category: categoryInput?.value || 'Uncategorized'
+  };
+
+  const errors = validateTask(formData);
+  if (errors.length) {
+    showToast(
+      `Please fix the following errors:\n- ${errors.join('\n- ')}`,
+      'error',
+      'Validation Failed'
+    );
+    return;
+  }
+
+  const newTask = {
+    ...formData,
+    createdAt: new Date().toISOString(),
+    completedAt: null,
+    completed: false
+  };
+
+  // Optimistic UX
+  showToast('Task created successfully!', 'success');
+  form.reset();
+  resetCategorySelect(categoryInput);
+
+  dbService.addTask(newTask).catch(err => {
+    console.error(err);
+    showToast('Error creating task', 'error');
+  });
+}
+
+/* ======================================================
+   VALIDATION
+====================================================== */
+
+function validateTask({ title, dueDate }) {
+  const errors = [];
+
+  if (!title) errors.push('Title is required.');
+  else if (title.length < 3)
+    errors.push('Title must be at least 3 characters long.');
+
+  if (!dueDate) errors.push('Due date is required.');
+
+  return errors;
+}
+
+/* ======================================================
+   RENDERING — TASK LIST
+====================================================== */
 
 function renderTasks() {
-    if (!taskListUl) return;
-    taskListUl.innerHTML = '';
-    const filteredTasks = tasks.filter(task => {
-        if (currentFilter === 'pending') return !task.completed;
-        return true; 
-    });
+  if (!taskListUl) return;
 
-    filteredTasks.forEach(task => {
-        const li = createTaskElement(task);
-        taskListUl.appendChild(li);
-    });
+  taskListUl.innerHTML = '';
+
+  const categoriesMap = loadCategoriesMap();
+  const visibleTasks = getFilteredTasks();
+
+  const fragment = document.createDocumentFragment();
+
+  visibleTasks.forEach(task => {
+    fragment.appendChild(
+      createTaskElement(task, categoriesMap)
+    );
+  });
+
+  taskListUl.appendChild(fragment);
 }
 
-function createTaskElement(task) {
-    const li = document.createElement('li');
-    li.dataset.id = task.id; // Add ID for external referencing
-    li.classList.toggle('completed', task.completed);
-    li.classList.add('schedule-item');
-
-    // Get priority from category
-    const customCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
-    const categoryObj = customCategories.find(c => c.value === task.category);
-    let priorityHtml = '';
-    
-    // Check if we have a category object with priority
-    if (categoryObj && categoryObj.priority) {
-        priorityHtml = `<span class="priority-dot ${categoryObj.priority}" title="Priority: ${categoryObj.priority}" style="margin-right: 8px; vertical-align: middle;"></span>`;
-    }
-    
-    li.innerHTML = `
-        <div class="task-header">
-            <div class="status-task">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
-                        </svg>
-            </div>
-            <input class="input-checkbox" type="checkbox" ${task.completed ? 'checked' : ''}>
-            <span class="name-task" style="display: flex; align-items: center;">${priorityHtml}${task.title}</span>
-            <span class="date-task">Due: ${task.dueDate}</span>
-        </div>
-        <div class="description">
-            <span>${task.description}</span>
-            <p style="margin-top: 10px; font-size: 0.8rem; color: #6b7280;">Category: ${task.category}</p>
-        </div>
-        <div class="controls">
-            <!-- <button class="edit-button">Edit</button> -->
-            <button class="delete-button">Delete</button>
-        </div>
-    `;
-
-    // Interaction Logic
-    li.addEventListener('click', (e) => {
-        if (e.target.type === 'checkbox' || e.target.tagName === 'BUTTON') return;
-        const taskDescription = li.querySelector('.description');
-        const controls = li.querySelector('.controls');
-        taskDescription.classList.toggle('expanded');
-        controls.classList.toggle('expanded');
-        li.classList.toggle('focused');
-        li.querySelector('.status-task').classList.toggle('active');
-    });
-
-    // Checkbox Logic
-    li.querySelector('.input-checkbox').addEventListener('change', (e) => {
-        e.stopPropagation();
-        const checked = e.target.checked;
-        const updates = {
-            completed: checked,
-            completedAt: checked ? new Date().toISOString() : null
-        };
-        
-        dbService.updateTask(task.id, updates);
-        
-        // UI updates will happen on snapshot
-        li.classList.toggle('completed', checked);
-    });
-
-    // Delete Logic
-    const deleteBtn = li.querySelector('.delete-button');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showConfirmModal({
-                title: 'Delete Task',
-                message: 'Are you sure you want to delete this task? This action cannot be undone.',
-                confirmText: 'Delete',
-                onConfirm: () => {
-                   dbService.deleteTask(task.id);
-                   showToast('Task deleted successfully', 'success');
-                }
-            });
-        });
-    }
-
-    // Edit Logic (Simple Prompt for now)
-    /* 
-    const editBtn = li.querySelector('.edit-button');
-    if (editBtn) {
-        editBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const newTitle = prompt("Edit Title:", task.title);
-            if (newTitle) {
-                task.title = newTitle;
-                saveTasks();
-                renderTasks();
-            }
-        });
-    } 
-    */
-
-    return li;
+function getFilteredTasks() {
+  if (currentFilter === 'pending') {
+    return tasks.filter(t => !t.completed);
+  }
+  return tasks;
 }
 
-// Replaced renderTask with renderTasks (plural) and helper createTaskElement
-// Function renderTask(task) { ... } is removed in favor of full list rendering for consistency with persistence
+/* ======================================================
+   TASK ELEMENT
+====================================================== */
 
-function checkEmptyState() {
-    if (!noTasksMessage) return;
-    // Check against total tasks, or filtered? Usually total tasks determines "No tasks added yet".
-    if (tasks.length === 0) {
-        noTasksMessage.classList.add('active');
-    } else {
-        noTasksMessage.classList.remove('active');
-    }
+function createTaskElement(task, categoriesMap) {
+  const li = document.createElement('li');
+
+  li.dataset.id = task.id;
+  li.id = task.id; // Para navegação direta
+  li.className = 'schedule-item';
+  li.classList.toggle('completed', task.completed);
+
+  const category = categoriesMap.get(task.category);
+  const priorityDot = category?.priority
+    ? `<span class="priority-dot ${category.priority}" title="Priority: ${category.priority}"></span>`
+    : '';
+
+  li.innerHTML = `
+    <div class="task-header">
+      <div class="status-task"></div>
+      <input class="input-checkbox" type="checkbox" ${task.completed ? 'checked' : ''}>
+      <span class="name-task">${priorityDot}${task.title}</span>
+      <span class="date-task">Due: ${task.dueDate}</span>
+    </div>
+
+    <div class="description">
+      <span>${task.description}</span>
+      <p class="task-category">Category: ${task.category}</p>
+    </div>
+
+    <div class="controls">
+      <button class="delete-button">Delete</button>
+    </div>
+  `;
+
+  attachTaskEvents(li, task);
+  return li;
+}
+
+/* ======================================================
+   TASK EVENTS
+====================================================== */
+
+function attachTaskEvents(li, task) {
+  // Expand / collapse
+  li.addEventListener('click', e => {
+    if (e.target.type === 'checkbox' || e.target.tagName === 'BUTTON') return;
+
+    li.classList.toggle('focused');
+    li.querySelector('.description')?.classList.toggle('expanded');
+    li.querySelector('.controls')?.classList.toggle('expanded');
+    li.querySelector('.status-task')?.classList.toggle('active');
+  });
+
+  // Completion
+  li.querySelector('.input-checkbox').addEventListener('change', e => {
+    e.stopPropagation();
+
+    dbService.updateTask(task.id, {
+      completed: e.target.checked,
+      completedAt: e.target.checked ? new Date().toISOString() : null
+    });
+  });
+
+  // Deletion
+  li.querySelector('.delete-button').addEventListener('click', e => {
+    e.stopPropagation();
+
+    showConfirmModal({
+      title: 'Delete Task',
+      message: 'Are you sure you want to delete this task?',
+      confirmText: 'Delete',
+      onConfirm: () => {
+        dbService.deleteTask(task.id);
+        showToast('Task deleted successfully', 'success');
+      }
+    });
+  });
+}
+
+/* ======================================================
+   UI HELPERS
+====================================================== */
+
+function updateListHeader() {
+  const header = document.querySelector('.list-tasks h1');
+  if (!header) return;
+
+  header.textContent =
+    currentFilter === 'all' ? 'All Tasks' : 'Pending Tasks';
+}
+
+function updateEmptyState() {
+  if (!noTasksMessage) return;
+  noTasksMessage.classList.toggle('active', tasks.length === 0);
+}
+
+function resetCategorySelect(categoryInput) {
+  const selectedDiv = document.querySelector('.select-selected');
+  if (selectedDiv) selectedDiv.textContent = 'Select Category';
+  if (categoryInput) categoryInput.value = '';
+}
+
+/* ======================================================
+   DATA HELPERS
+====================================================== */
+
+function loadCategoriesMap() {
+  const customCategories =
+    JSON.parse(localStorage.getItem('customCategories')) || [];
+
+  return new Map(customCategories.map(c => [c.value, c]));
 }

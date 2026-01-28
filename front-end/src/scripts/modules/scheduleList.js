@@ -1,132 +1,168 @@
-
-const scheduleListUl = document.querySelector('.list-schedules-ul');
-const noSchedulesMessage = document.querySelector('.no-schedules-message');
-import { showToast } from './notifications.js';
+import { showToast } from './alerts.js';
 import { showConfirmModal } from './modals.js';
 import { dbService } from '../services/db.js';
 
+/* ======================================================
+   DOM REFERENCES
+====================================================== */
+
+const scheduleListUl = document.querySelector('.list-schedules-ul');
+const noSchedulesMessage = document.querySelector('.no-schedules-message');
+
+/* ======================================================
+   STATE
+====================================================== */
+
 let schedules = [];
 
-export function initScheduleList() {
-    // renderSchedules(); // Wait for data
-    // checkEmptyState();
+/* ======================================================
+   INIT
+====================================================== */
 
-    // Listen for updates from DB
-    dbService.onSchedulesSnapshot((updatedSchedules) => {
-        schedules = updatedSchedules;
-        renderSchedules();
-        checkEmptyState();
-        document.dispatchEvent(new CustomEvent('schedulesUpdated'));
-    });
+export function initScheduleList() {
+  dbService.onSchedulesSnapshot(updatedSchedules => {
+    schedules = updatedSchedules;
+    renderSchedules();
+    updateEmptyState();
+
+    // Notify other modules (calendar, reminders, etc.)
+    document.dispatchEvent(
+      new CustomEvent('schedulesUpdated', { detail: schedules })
+    );
+  });
 }
+
+/* ======================================================
+   RENDERING — LIST
+====================================================== */
 
 function renderSchedules() {
-    if (!scheduleListUl) return;
-    scheduleListUl.innerHTML = '';
+  if (!scheduleListUl) return;
 
-    schedules.forEach(schedule => {
-        const li = createScheduleElement(schedule);
-        scheduleListUl.appendChild(li);
-    });
+  scheduleListUl.innerHTML = '';
+
+  const categoriesMap = loadScheduleCategories();
+  const fragment = document.createDocumentFragment();
+
+  schedules.forEach(schedule => {
+    fragment.appendChild(
+      createScheduleElement(schedule, categoriesMap)
+    );
+  });
+
+  scheduleListUl.appendChild(fragment);
 }
 
-function createScheduleElement(schedule) {
+/* ======================================================
+   SCHEDULE ITEM
+====================================================== */
 
+function createScheduleElement(schedule, categoriesMap) {
+  const li = document.createElement('li');
 
-    const li = document.createElement('li');
-    li.dataset.id = schedule.id; // Add ID for referencing
-    // Schedules might not have "completed" state like tasks, or maybe they do?
-    // scheduleForm.js sets completed: false.
-    li.classList.toggle('completed', schedule.completed);
-    li.classList.add('schedule-item');
+  li.dataset.id = schedule.id;
+  li.id = schedule.id; // Para navegação direta
+  li.className = 'schedule-item';
+  li.classList.toggle('completed', schedule.completed);
 
-    // Get priority from category
-    // For Schedules, we look at 'scheduleCategories'
-    const scheduleCategories = JSON.parse(localStorage.getItem('scheduleCategories')) || [];
-    // Fallback? If tasks can share categories logic is different, but user request separation.
-    
-    // We try to find in scheduleCategories first.
-    const categoryObj = scheduleCategories.find(c => c.value === schedule.category);
-    let priorityHtml = '';
-    
-    // Check if we have a category object with priority
-    if (categoryObj && categoryObj.priority) {
-        priorityHtml = `<span class="priority-dot ${categoryObj.priority}" title="Priority: ${categoryObj.priority}" style="margin-right: 8px; vertical-align: middle;"></span>`;
-    }
+  const category = categoriesMap.get(schedule.category);
+  const priorityDot = category?.priority
+    ? `<span class="priority-dot ${category.priority}" title="Priority: ${category.priority}"></span>`
+    : '';
 
-    li.innerHTML = `
-        <div class="task-header">
-         <div class="status-schedule">
-         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-</svg>
+  li.innerHTML = `
+    <div class="task-header">
+      <div class="status-schedule"></div>
 
-         </div>
-            <input class="input-checkbox" type="checkbox" ${schedule.completed ? 'checked' : ''}>
-            <span class="name-task" style="display: flex; align-items: center;">${priorityHtml}${schedule.title}</span>
-            <span class="date-task">${schedule.date} at ${schedule.time}</span>
-        </div>
-        <div class="description">
-            <span>${schedule.description}</span>
-            <p style="margin-top: 10px; font-size: 0.8rem; color: #6b7280;">Category: ${schedule.category || 'Uncategorized'}</p>
-        </div>
-        <div class="controls">
-            <button class="delete-button">Delete</button>
-        </div>
-    `;
+      <input class="input-checkbox" type="checkbox" ${
+        schedule.completed ? 'checked' : ''
+      }>
 
-    // Interaction Logic (Expand/Collapse)
-    li.addEventListener('click', (e) => {
-        if (e.target.type === 'checkbox' || e.target.tagName === 'BUTTON') return;
-        const description = li.querySelector('.description');
-        const controls = li.querySelector('.controls');
-        description.classList.toggle('expanded');
-        controls.classList.toggle('expanded');
-        li.classList.toggle('focused');
-        li.querySelector('.status-schedule').classList.toggle('active');
+      <span class="name-task">
+        ${priorityDot}${schedule.title}
+      </span>
 
+      <span class="date-task">
+        ${schedule.date} at ${schedule.time}
+      </span>
+    </div>
 
-    });
+    <div class="description">
+      <span>${schedule.description}</span>
+      <p class="task-category">
+        Category: ${schedule.category || 'Uncategorized'}
+      </p>
+    </div>
 
-    // Checkbox Logic (Toggle Completion)
-    li.querySelector('.input-checkbox').addEventListener('change', (e) => {
-        e.stopPropagation();
-        const checked = e.target.checked;
-        dbService.updateSchedule(task.id, { completed: checked }); // Assuming updateSchedule exists
-        li.classList.toggle('completed', checked);
-    });
+    <div class="controls">
+      <button class="delete-button">Delete</button>
+    </div>
+  `;
 
-    // Delete Logic
-    const deleteBtn = li.querySelector('.delete-button');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showConfirmModal({
-                title: 'Delete Schedule',
-                message: 'Are you sure you want to delete this schedule? This action cannot be undone.',
-                confirmText: 'Delete',
-                onConfirm: () => {
-                    dbService.deleteSchedule(schedule.id);
-                    showToast('Schedule deleted successfully', 'success');
-                }
-            });
-        });
-    }
-
-    return li;
+  attachScheduleEvents(li, schedule);
+  return li;
 }
-/*
-function saveSchedules() {
-    localStorage.setItem('schedules', JSON.stringify(schedules));
-    // Dispatch event so other parts (like Dashboard if we add it later) know
-    document.dispatchEvent(new CustomEvent('schedulesUpdated'));
+
+/* ======================================================
+   ITEM EVENTS
+====================================================== */
+
+function attachScheduleEvents(li, schedule) {
+  // Expand / collapse
+  li.addEventListener('click', e => {
+    if (e.target.type === 'checkbox' || e.target.tagName === 'BUTTON') return;
+
+    li.classList.toggle('focused');
+    li.querySelector('.description')?.classList.toggle('expanded');
+    li.querySelector('.controls')?.classList.toggle('expanded');
+    li.querySelector('.status-schedule')?.classList.toggle('active');
+  });
+
+  // Completion toggle
+  li.querySelector('.input-checkbox').addEventListener('change', e => {
+    e.stopPropagation();
+
+    dbService.updateSchedule(schedule.id, {
+      completed: e.target.checked
+    });
+  });
+
+  // Delete
+  li.querySelector('.delete-button').addEventListener('click', e => {
+    e.stopPropagation();
+
+    showConfirmModal({
+      title: 'Delete Schedule',
+      message:
+        'Are you sure you want to delete this schedule? This action cannot be undone.',
+      confirmText: 'Delete',
+      onConfirm: () => {
+        dbService.deleteSchedule(schedule.id);
+        showToast('Schedule deleted successfully', 'success');
+      }
+    });
+  });
 }
-*/
-function checkEmptyState() {
-    if (!noSchedulesMessage) return;
-    if (schedules.length === 0) {
-        noSchedulesMessage.classList.add('active');
-    } else {
-        noSchedulesMessage.classList.remove('active');
-    }
+
+/* ======================================================
+   UI HELPERS
+====================================================== */
+
+function updateEmptyState() {
+  if (!noSchedulesMessage) return;
+  noSchedulesMessage.classList.toggle(
+    'active',
+    schedules.length === 0
+  );
+}
+
+/* ======================================================
+   DATA HELPERS
+====================================================== */
+
+function loadScheduleCategories() {
+  const stored =
+    JSON.parse(localStorage.getItem('scheduleCategories')) || [];
+
+  return new Map(stored.map(c => [c.value, c]));
 }
