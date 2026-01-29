@@ -1,38 +1,55 @@
+
+/* ===================== NOTIFICATIONS CSS REFACTORED ===================== */
+
+/* --- Toast Notification Styles --- */
 .toast-reminder-label {
     display: block;
     text-align: center;
     font-size: 1em;
     color: var(--color-warning);
     font-weight: 700;
-    margin-top: 2px;
-    margin-bottom: 0;
+    margin: 2px 0 0 0;
     letter-spacing: 0.5px;
 }
+
 .toast-top-row {
     display: grid;
     grid-auto-flow: column;
     justify-content: space-between;
     align-items: flex-start;
-    justify-content: space-between;
     width: 100%;
     margin-bottom: 4px;
 }
-.toast-icon-top {
 
-    width: auto;
-    margin-bottom: 0;
-    margin-top: 2px;
+.toast-icon-top {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin: 2px 0 0 0;
 }
 .toast-icon-top svg {
     width: 32px;
     height: 32px;
 }
+
 .toast-close {
     align-self: flex-start;
     margin-left: auto;
     margin-top: 2px;
     margin-right: 0;
     z-index: 1;
+    cursor: pointer;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 8px;
+    transition: color 0.2s;
+}
+.toast-close:hover {
+    color: var(--text-primary);
 }
 
 .toast-message {
@@ -45,6 +62,16 @@
     word-break: break-word;
     flex: 1 1 auto;
     min-width: 0;
+}
+
+.toast-content {
+    flex-grow: 1;
+}
+.toast-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: var(--text-primary);
 }
 
 .toast-counts-row {
@@ -63,53 +90,15 @@
     box-shadow: 0 1px 4px var(--hover-overlay-light);
 }
 .toast-task-count, .toast-schedule-count {
- 
     border-radius: 6px;
     font-weight: 700;
     font-size: 1em;
     display: inline-block;
 }
-.toast-task-count {
-    color: var(--color-success);
-    font-weight: 700;
-}
-.toast-schedule-count {
-    color: var(--color-warning);
-    font-weight: 700;
-}
-.notification-item-link {
-    cursor: pointer;
-    border-radius: 10px;
-    transition: background 0.2s, box-shadow 0.2s;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    
-}
-.notification-item-link:hover, .notification-item-link:focus {
-    background: var(--hover-overlay-light, #f3f4f6);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    outline: none;
-}
-.notification-item-category {
-    font-size: 0.82rem;
-    color: var(--color-primary);
-    margin-bottom: 2px;
-}
-.highlight-notification {
-    animation: highlight-notification-blink 2.2s 1;
-    background: var(--highlight-bg, #e5e7eb) !important;
-    transition: background 0.3s;
-}
+.toast-task-count { color: var(--color-success); }
+.toast-schedule-count { color: var(--color-warning); }
 
-@keyframes highlight-notification-blink {
-    0%   { background: var(--highlight-bg, #e5e7eb); }
-    20%  { background: var(--highlight-bg, #e5e7eb); }
-    30%  { background: var(--highlight-bg2, #f3f4f6); }
-    40%  { background: var(--highlight-bg, #e5e7eb); }
-    60%  { background: var(--highlight-bg, #e5e7eb); }
-    70%  { background: var(--highlight-bg2, #f3f4f6); }
-    80%  { background: var(--highlight-bg, #e5e7eb); }
-    100% { background: var(--highlight-bg, #e5e7eb); }
-}
+/* --- Toast Container --- */
 #toast-container {
     position: fixed;
     top: 24px;
@@ -120,12 +109,11 @@
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    pointer-events: none; /* Let clicks pass through container area */
+    pointer-events: none;
 }
 
 .toast {
     pointer-events: auto;
-
     color: var(--text-primary);
     border: 1px solid var(--border-dim);
     box-shadow: 0 10px 15px -3px var(--hover-overlay-medium), 0 4px 6px -2px var(--hover-overlay-light);
@@ -139,107 +127,38 @@
     opacity: 0;
     transform: translateX(100%);
     transition:
-   opacity 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55),
-   transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        opacity 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+        transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     position: relative;
     overflow: hidden;
+    background: var(--toast-bg, #fff);
 }
-
 .toast.show {
     opacity: 1;
     transform: translateX(0);
 }
-
-.toast-icon-top {
- 
-    width: 100%;
-
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    align-items: center;
-    
-}
-.toast-icon-top svg {
-    width: 32px;
-    height: 32px;
-}
-
 .toast.hide {
     opacity: 0;
     transform: translateX(100%);
 }
 
-
-.toast-content {
-    flex-grow: 1;
-}
-
-.toast-title {
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 4px;
-    color: var(--text-primary);
-}
-
-.toast-message {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-}
-
-.toast-close {
-    cursor: pointer;
-    color: var(--text-muted);
-    background: none;
-    border: none;
-    padding: 0;
-    margin-left: 8px;
-    transition: color 0.2s;
-    align-self: flex-start;
-}
-
-.toast-close:hover {
-    color: var(--text-primary);
-}
-
-/* Types */
-.toast.success {
-    border-left: 4px solid var(--color-success);
-}
-
-.toast-icon {
-    align-self: flex-start;
-}
-.toast.success .toast-icon {
-    color: var(--color-success);
-}
-
-.toast.error {
-    border-left: 4px solid var(--color-danger);
-}
-.toast.error .toast-icon {
-    color: var(--color-danger);
-}
-
-.toast.warning  {
+/* --- Toast Types --- */
+.toast.success { border-left: 4px solid var(--color-success); }
+.toast.success .toast-icon { color: var(--color-success); }
+.toast.error { border-left: 4px solid var(--color-danger); }
+.toast.error .toast-icon { color: var(--color-danger); }
+.toast.warning { border-left: 4px solid var(--color-warning); }
+.toast.warning .toast-icon { color: var(--color-warning); }
+.toast.info { border-left: 4px solid var(--color-primary); }
+.toast.info .toast-icon { color: var(--color-primary); }
+.toast.warning {
     display: flex;
     flex-direction: column;
-    border-left: 4px solid var(--color-warning);
-
-    & h4 {
-        display: block;
-    }
 }
+.toast.warning > * { margin: 0!important; }
+.toast-icon { align-self: flex-start; }
 
-.toast.warning > * {
-    margin: 0!important;
-}
-.toast.warning .toast-icon {
-    color: var(--color-warning);
-}
-
-/* Progress Bar (Optional) */
+/* --- Toast Progress Bar --- */
 .toast-progress {
     position: absolute;
     bottom: 0;
@@ -249,31 +168,27 @@
     opacity: 0.3;
     animation: toast-progress linear forwards;
 }
-
 @keyframes toast-progress {
     from { width: 100%; }
     to { width: 0%; }
 }
 
-/* Types */
-.toast.success { border-left: 4px solid var(--color-success); }
-.toast.success .toast-icon { color: var(--color-success); }
-
-.toast.error { border-left: 4px solid var(--color-danger); }
-.toast.error .toast-icon { color: var(--color-danger); }
-
-.toast.warning { border-left: 4px solid var(--color-warning); }
-.toast.warning .toast-icon { color: var(--color-warning); }
-
-.toast.info { border-left: 4px solid var(--color-primary); }
-.toast.info .toast-icon { color: var(--color-primary); }
-
-/* --- Notification Badge --- */
-.alert-btn {
-    position: relative; 
-    /* Ensure button has relative positioning for absolute badge */
+/* --- Highlight Animation --- */
+.highlight-notification, .task-item:focus, .task-item.selected {
+    animation: highlight-notification-blink 2.2s 1;
+    background: var(--highlight-bg) !important;
+    border: 1px solid var(--highlight-border);
+    box-shadow: 0 0 20px 0px var(--highlight-border, #e1e1e1), 0 1px 5px rgba(179, 179, 179, 0.382);
+    transition: background 0.3s, border 0.3s, box-shadow 0.3s;
+    z-index: 2;
+}
+@keyframes highlight-notification-blink {
+    0%, 20%, 40%, 60%, 80%, 100% { background: var(--highlight-bg, #e5e7eb); }
+    30%, 70% { background: var(--highlight-bg2, #f3f4f6); }
 }
 
+/* --- Notification Badge --- */
+.alert-btn { position: relative; }
 .notification-badge {
     position: absolute;
     top: -5px;
@@ -289,12 +204,9 @@
     align-items: center;
     justify-content: center;
     padding: 0 4px;
-    border: 2px solid var(--bg-primary, #ffffff); /* Add border to separate from icon */
+    border: 2px solid var(--bg-primary, #ffffff);
 }
-
-.notification-badge.hidden {
-    display: none;
-}
+.notification-badge.hidden { display: none; }
 
 /* --- Notification Modal List --- */
 #notification-list-modal .modal-content {
@@ -304,6 +216,28 @@
     display: flex;
     flex-direction: column;
     gap: .5rem;
+    overflow-y: auto;
+    /* Scrollbar Customization */
+    scrollbar-width: thin;
+    scrollbar-color: #fdb1bb #fbd8e2; /* thumb color, track color */
+}
+
+/* Webkit browsers */
+#notification-list-modal .modal-content::-webkit-scrollbar {
+    width: 8px;
+    background: #fbd8e2;
+    border-radius: 8px;
+}
+#notification-list-modal .modal-content::-webkit-scrollbar-thumb {
+    background: #fdb1bb;
+    border-radius: 8px;
+    min-height: 24px;
+}
+#notification-list-modal .modal-content::-webkit-scrollbar-thumb:hover {
+    background: #fa8181;
+}
+#notification-list-modal .modal-content::-webkit-scrollbar-corner {
+    background: #fbd8e2;
 }
 
 .notification-list {
@@ -311,12 +245,10 @@
     gap: .5rem;
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 1rem 0 0 0;
     overflow-y: auto;
     flex: 1;
-    margin-top: 1rem;
 }
-
 .notification-item {
     padding: 1rem;
     border-bottom: 1px solid var(--border-dim);
@@ -324,11 +256,7 @@
     flex-direction: column;
     gap: 4px;
 }
-
-.notification-item:last-child {
-    border-bottom: none;
-}
-
+.notification-item:last-child { border-bottom: none; }
 .notification-item-header {
     display: flex;
     flex-direction: row;
@@ -337,7 +265,6 @@
     justify-content: flex-start;
     min-height: 28px;
 }
-
 .notification-item-title {
     font-weight: 600;
     font-size: 0.95rem;
@@ -346,7 +273,6 @@
     align-items: center;
     gap: 0.2rem;
 }
-
 .notification-item-tag {
     font-size: 0.75rem;
     padding: 1px 7px;
@@ -361,23 +287,27 @@
     height: 20px;
     line-height: 1;
 }
+/* ===================== END NOTIFICATIONS CSS REFACTORED ===================== */
 
-.notification-item-tag.task { background-color: rgba(16, 185, 129, 0.1); color: var(--color-success); }
+
 .notification-item-tag.schedule { background-color: rgba(59, 130, 246, 0.1); color: var(--color-secondary); }
 
 .notification-item-info {
     font-size: 0.85rem;
-    color: var(--color-secondary);
+
 }
 
 .notification-item-due {
     font-size: 0.8rem;
-    color: var(--color-danger);
     font-weight: 500;
     margin-top: 4px;
     display: flex;
     align-items: center;
     gap: 4px;
+    font-weight: 700;
+
+
+    
 }
 
 /*
@@ -393,8 +323,52 @@
 
      & .schedule-item {
         background-color: var(--bg-third) !important;
+          border-right: 5px solid #ffa4a4;
+        
+    }
+    
+}
+
+.modal-btn-delete {
+     color: white;
+    background-color: #fa8181;
+    filter: brightness(0.95);
+    transition: all 800ms;
+
+    &:hover {
+      
+       box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.2);
+          color: white;
+    background-color: #f82727;
+    filter: brightness(0.95);
+    transform: scale(1.05);
+
     }
 }
+
+.modal-btn-cancel {
+    transition: all 800ms;
+     color: white;
+    background-color: #ffffff;
+    filter: brightness(0.95);
+    color: rgb(0, 0, 0);
+ 
+
+    &:hover {
+       background-color: #000000;
+       box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.2);
+          color: rgb(37, 37, 37);
+    background-color: #ffffff;
+    filter: brightness(0.95);
+         filter: brightness(0.95);
+    transform: scale(1.05);
+    }
+ 
+}
+
+
+
+
 
 /*
  * MODO ESCURO:
@@ -406,6 +380,8 @@
 
     & .schedule-item {
         background-color: var(--bg-secondary) !important;
+        border-right: 5px solid var(--border-dim);
+        border-right: 5px solid var(--border-dim);
     }
 }
 
@@ -442,21 +418,27 @@
  */
 :root[data-theme="light"] {
     --notification-link-bg: #f8e8e8; /* Tom rosa claro, visível e suave para listas */
+    --toast-bg: #fff;
 
-    & .notification-item-link {
-        background-color: var(--notification-link-bg);
-    }
 
      & .notification-item-link:hover {
         background-color: #fdb1bb;
     }
 
+    .modal-content {
+        background-color: #fbd8e2;
+    }
+
+    .notification-item-header {
+       
+      
+    }
       
   
     
         li {
             width: 100%;
-              box-shadow: 2px 0 0 0 var(--bd-li);
+           
             max-width: 600px;
             min-width: 200px;
             margin: 0 auto 1rem auto;
@@ -464,13 +446,22 @@
             border-radius: 0.5rem;
             cursor: pointer;
             padding: 1rem;
+            background-color: #ffebf9;
+            border-radius: 1rem;
+        
            
             transition: all 0.3s ease;
 
             span {
-                color: #23272e;
+                color: #424242;
             }
             /* Fundo padrão, será sobrescrito por tema */
+
+            .notification-item-category {
+                strong {
+                    color: #555555;
+                }
+            }
           
 
             
@@ -490,14 +481,136 @@
 .name-task {
     align-items: center;
 }
+
+
+
+
+
+
+
+
+
+
 }
 /*
  * MODO ESCURO: fundo cinza escuro, contraste forte
  */
 :root[data-theme="dark"] {
-    --notification-link-bg: #2a2d34;
+    --toast-bg: #161b22;
+    --modal-content-bg: #161b22;
 
-    li {
-    box-shadow: 2px 0 0 0 var(--color-primary);
+
+     /* --- Brand Colors --- */
+    --color-primary: #444584;           /* Indigo-500 */
+    --color-primary-rgb: 99, 102, 241;  /* For RGBA usage */
+    
+    /* --- Backgrounds --- */
+    --bg-main: #0d1117;                 /* Deep dark background */
+    --bg-secondary: #0e1a2b;            /* Slightly lighter (Forms/Cards) */
+    --bg-tertiary: #0c1728;             /* List backgrounds */
+    --bg-btn-dark: #152c4f;             /* Dark Button Background */
+    
+    /* Gradients */
+    --bg-gradient-start: #070d17;
+    --bg-gradient-end: #080e17;
+    --bg-gradient-main: linear-gradient(180deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    
+    /* Component Specific Backgrounds */
+    --bg-icon-box: #01275c77;           /* Menu Icon Background */
+    --bg-elevated: #161b22;             /* Dropdowns/Modals (Darker than secondary) */
+    --bg-hover: #1f2937;                /* Dark hover */
+    --bg-active: #1e1b4b;               /* Dark active (indigo tint) */
+    
+    /* --- Text Colors --- */
+    --text-primary: #ffffff;            /* Pure White */
+    --text-secondary: #cbd5e1;          /* Slate-300 */
+    --text-muted: #626262;              /* Gray-400 */
+    --text-disabled: #6b7280;           /* Gray-500 */
+
+    /* --- Borders & Outlines --- */
+    --border-dim: #30363d;              /* Subtle border */
+    --border-input: #374151;            /* Input underline */
+    --border-divider: rgba(255, 255, 255, 0.1);
+
+    /* --- Interactions / States --- */
+    --hover-overlay-light: rgba(255, 255, 255, 0.06);
+    --hover-overlay-medium: rgba(255, 255, 255, 0.12);
+    --focus-overlay-primary: rgba(99, 102, 241, 0.1); 
+
+    --list-task-background: #3636360d;    /* Task item background */
+
+    }
+
+    :root[data-theme="dark"] #notification-list-modal .modal-content {
+        scrollbar-width: thin;
+        scrollbar-color: #444584 #161b22; /* thumb, track */
+        background-color: var(--modal-content-bg, #314560);
+        color: var(--text-primary);
+        box-shadow: 0 1px 8px 0 #00000080;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        background-color: #01113159;
+    }
+
+    :root[data-theme="dark"] #notification-list-modal .modal-content .notification-item-header {
+        /* Mantém estrutura, pode customizar se necessário */
+    }
+
+   li {
+        width: 100%;
+        max-width: 600px;
+        min-width: 200px;
+        margin: 0 auto 1rem auto;
+        margin-top: 0.5rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        padding: 1rem;
+        background-color: #2b55ff0f;
+        transition: all 0.3s ease;
+    }
+
+    
+
+
+
+      
+  
+    
+        li {
+            width: 100%;
+              box-shadow: 2px 0 0 0 var(--bd-li);
+            max-width: 600px;
+            min-width: 200px;
+            margin: 0 auto 1rem auto;
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            padding: 1rem;
+           
+            transition: all 0.3s ease;
+
+            span {
+                color: #c9c9c9;
+            }
+            /* Fundo padrão, será sobrescrito por tema */
+          
+
+            
+            & li.focused {
+                background: var(--focus-overlay-primary); 
+                border-radius: 0.5rem;
+                border-bottom-color: transparent; 
+               
+                
+               
+            }
 }
+
+.delete-button {
+    background-color: var(--bd-li);
 }
+
+.name-task {
+    align-items: center;
+}
+

@@ -191,15 +191,7 @@
     transition: background-color 0.2s;
 }
 
-.modal-btn-cancel {
-    background-color: var(--bg-btn-dark, #e2e8f0); 
-    color: var(--text-secondary);
-}
 
-.modal-btn-cancel:hover {
-    background-color: var(--border-dim);
-    filter: brightness(0.95);
-}
 
 .modal-btn-confirm {
     background-color: var(--color-primary);
@@ -210,11 +202,5 @@
     filter: brightness(1.1);
 }
 
-.modal-btn-delete {
-    background-color: var(--color-danger);
-    color: white;
-}
 
-.modal-btn-delete:hover {
-    filter: brightness(0.9);
-}
+
