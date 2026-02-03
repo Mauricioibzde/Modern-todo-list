@@ -95,34 +95,55 @@ export function initNavigation() {
   /* ======================================================
      CORE ROUTE HANDLER
   ====================================================== */
-  function navigate(routeId) {
+  function navigate(routeId, addToHistory = true) {
     handleRouteSideEffects(routeId);
     hideAllSections();
     showSectionByRoute(routeId);
     updateMenuActiveState(routeId);
+    closeSidebarOnMobile();
 
     localStorage.setItem('currentView', routeId);
+
+    if (addToHistory) {
+      const url = new URL(window.location);
+      url.searchParams.set('page', routeId);
+      window.history.pushState({ routeId }, '', url);
+    }
   }
 
   /* ======================================================
-     EVENT BINDING
+     EVENT BINDING (DELEGATION & HISTORY)
   ====================================================== */
-  Object.keys(ROUTES).forEach(routeId => {
-    const link = document.getElementById(routeId);
-    if (!link) return;
+  
+  // History Back/Forward
+  window.addEventListener('popstate', (event) => {
+    const routeId = event.state?.routeId || 'nav-dashboard';
+    navigate(routeId, false);
+  });
 
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      navigate(routeId);
-      closeSidebarOnMobile();
-    });
+  // Menu Clicks
+  document.addEventListener('click', e => {
+     const link = e.target.closest('a');
+     if (!link) return;
+     
+     // Check if ID is in ROUTES
+     if (ROUTES[link.id]) {
+         e.preventDefault();
+         navigate(link.id);
+     }
   });
 
   /* ======================================================
      INITIAL LOAD
   ====================================================== */
-  const savedRoute =
-    localStorage.getItem('currentView') || 'nav-dashboard';
+  const urlParams = new URLSearchParams(window.location.search);
+  const pageParam = urlParams.get('page');
+  const savedRoute = pageParam || localStorage.getItem('currentView') || 'nav-dashboard';
 
-  navigate(savedRoute);
+  // Replace current history entry so we have state
+  const url = new URL(window.location);
+  url.searchParams.set('page', savedRoute);
+  window.history.replaceState({ routeId: savedRoute }, '', url);
+
+  navigate(savedRoute, false);
 }

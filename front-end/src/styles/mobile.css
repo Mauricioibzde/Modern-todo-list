@@ -64,6 +64,7 @@
     .search-wrapper {
         width: 100%;
         margin-bottom: 2rem;
+        padding: 0;
     }
 
     #search-input {
@@ -211,5 +212,13 @@ section {
     padding: 0.5rem 0.2rem !important;
 }
 
+.search-results-ul  {
+  max-width: 100% !important;
 
+  li {
+    max-width: 100% !important;
+  }
+
+
+}
 }

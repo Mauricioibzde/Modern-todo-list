@@ -1,6 +1,7 @@
 import dayjs from 'https://cdn.jsdelivr.net/npm/dayjs@1.11.10/+esm';
 import { showDayDetailsModal } from './modals.js';
 import { dbService } from '../services/db.js';
+import { store } from '../store.js';
 
 export class Calendar {
 
@@ -13,8 +14,8 @@ export class Calendar {
     this.currentDate = dayjs();
     this.selectedDate = null;
 
-    this.tasks = [];
-    this.schedules = [];
+    this.tasks = store.getTasks();
+    this.schedules = store.getSchedules();
 
     this.isInline = false;
 
@@ -59,13 +60,13 @@ export class Calendar {
      DATA SUBSCRIPTIONS
   ====================================================== */
   subscribeToData() {
-    dbService.onTasksSnapshot(data => {
-      this.tasks = data;
+    store.addEventListener('tasksUpdated', (e) => {
+      this.tasks = e.detail;
       this.renderCalendar();
     });
 
-    dbService.onSchedulesSnapshot(data => {
-      this.schedules = data;
+    store.addEventListener('schedulesUpdated', (e) => {
+      this.schedules = e.detail;
       this.renderCalendar();
     });
   }

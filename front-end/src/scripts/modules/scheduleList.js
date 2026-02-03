@@ -1,6 +1,7 @@
 import { showToast } from './alerts.js';
 import { showConfirmModal } from './modals.js';
 import { dbService } from '../services/db.js';
+import { store } from '../store.js';
 
 /* ======================================================
    DOM REFERENCES
@@ -10,25 +11,14 @@ const scheduleListUl = document.querySelector('.list-schedules-ul');
 const noSchedulesMessage = document.querySelector('.no-schedules-message');
 
 /* ======================================================
-   STATE
-====================================================== */
-
-let schedules = [];
-
-/* ======================================================
    INIT
 ====================================================== */
 
 export function initScheduleList() {
-  dbService.onSchedulesSnapshot(updatedSchedules => {
-    schedules = updatedSchedules;
-    renderSchedules();
-    updateEmptyState();
-
-    // Notify other modules (calendar, reminders, etc.)
-    document.dispatchEvent(
-      new CustomEvent('schedulesUpdated', { detail: schedules })
-    );
+  store.addEventListener('schedulesUpdated', (e) => {
+    const schedules = e.detail;
+    renderSchedules(schedules);
+    updateEmptyState(schedules);
   });
 }
 
@@ -36,15 +26,17 @@ export function initScheduleList() {
    RENDERING — LIST
 ====================================================== */
 
-function renderSchedules() {
+function renderSchedules(schedules) {
   if (!scheduleListUl) return;
+  // Fallback to store if not passed
+  const currentSchedules = schedules || store.getSchedules();
 
   scheduleListUl.innerHTML = '';
 
   const categoriesMap = loadScheduleCategories();
   const fragment = document.createDocumentFragment();
 
-  schedules.forEach(schedule => {
+  currentSchedules.forEach(schedule => {
     fragment.appendChild(
       createScheduleElement(schedule, categoriesMap)
     );
@@ -148,11 +140,12 @@ function attachScheduleEvents(li, schedule) {
    UI HELPERS
 ====================================================== */
 
-function updateEmptyState() {
+function updateEmptyState(schedules) {
+  const currentSchedules = schedules || store.getSchedules();
   if (!noSchedulesMessage) return;
   noSchedulesMessage.classList.toggle(
     'active',
-    schedules.length === 0
+    currentSchedules.length === 0
   );
 }
 

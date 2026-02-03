@@ -2,6 +2,7 @@
     position: fixed;
     transform: translateX(0);
     border-right: 1px solid var(--border-dim);
+
   
     display: flex;
   width: 260px;
@@ -9,7 +10,7 @@
   color: var(--text-secondary);
   flex-direction: column;
   padding: 40px 16px 80px 16px;
-  z-index: 99;
+  z-index: 900;
   left: 0;
   height: 100vh;
   transition: transform 0.3s ease-in-out;
@@ -49,7 +50,7 @@ main.sidebar-closed {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 20000;
   cursor: pointer;
   color: var(--text-primary);
   margin-right: 1rem; /* Spacing from edge or title if added later */

@@ -141,7 +141,7 @@ function renderItemRow(item) {
     <li class="modal-item-row"
         data-id="${item.id}"
         data-type="${item.type}">
-      <div class="item-icon">${getItemIcon(isTask)}</div>
+    
 
       <div class="item-info">
         <div class="item-title">${item.title}</div>
@@ -156,11 +156,6 @@ function renderItemRow(item) {
   `;
 }
 
-function getItemIcon(isTask) {
-  return isTask
-    ? '📋'
-    : '⏰';
-}
 
 /* ======================================================
    ITEM NAVIGATION

@@ -558,7 +558,7 @@
 
    li {
         width: 100%;
-        max-width: 600px;
+
         min-width: 200px;
         margin: 0 auto 1rem auto;
         margin-top: 0.5rem;
@@ -579,7 +579,6 @@
         li {
             width: 100%;
               box-shadow: 2px 0 0 0 var(--bd-li);
-            max-width: 600px;
             min-width: 200px;
             margin: 0 auto 1rem auto;
             margin-top: 0.5rem;

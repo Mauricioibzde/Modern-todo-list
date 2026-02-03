@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper to check if the document belongs to the user
+    // Assumes documents have a 'userId' field matching auth.uid
+    // Since the current app doesn't seem to implement Auth fully yet,
+    // this is a placeholder for future implementation.
+    function isOwner(resource) {
+      return resource.data.userId == request.auth.uid;
+    }
+
+    match /tasks/{taskId} {
+      allow read, write: if true; // WARNING: Open for development. Change to isAuthenticated() later.
+      // Example of secure rule:
+      // allow read, write: if isAuthenticated() && isOwner(resource);
+    }
+    
+    match /schedules/{scheduleId} {
+      allow read, write: if true;
+    }
+    
+    match /categories/{categoryId} {
+        allow read: if true;
+        allow write: if false; // Only admin updates categories
+    }
+  }
+}

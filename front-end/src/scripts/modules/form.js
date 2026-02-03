@@ -2,6 +2,8 @@ import { updateDashboard } from './dashboard.js';
 import { showToast } from './alerts.js';
 import { showConfirmModal } from './modals.js';
 import { dbService } from '../services/db.js';
+import { validateTask } from '../utils/validators.js';
+import { store } from '../store.js';
 
 /* ======================================================
    DOM REFERENCES
@@ -18,24 +20,17 @@ const noTasksMessage = document.querySelector('.no-tasks-message');
    STATE
 ====================================================== */
 
-let tasks = [];
 let currentFilter = 'pending'; // 'pending' | 'all'
 
 /* ======================================================
-   INIT — REALTIME SYNC
+   INIT — REALTIME SYNC (VIA STORE)
 ====================================================== */
 
-dbService.onTasksSnapshot(updatedTasks => {
-  tasks = updatedTasks;
-
-  renderTasks();
-  updateEmptyState();
-  updateDashboard(tasks);
-
-  // Notify other modules (search, calendar, etc.)
-  document.dispatchEvent(
-    new CustomEvent('tasksUpdated', { detail: tasks })
-  );
+store.addEventListener('tasksUpdated', (e) => {
+    const tasks = e.detail;
+    renderTasks(tasks); 
+    updateEmptyState(tasks);
+    updateDashboard(tasks);
 });
 
 /* ======================================================
@@ -44,7 +39,7 @@ dbService.onTasksSnapshot(updatedTasks => {
 
 document.addEventListener('filterTasks', e => {
   currentFilter = e.detail.filter;
-  renderTasks();
+  renderTasks(store.getTasks());
   updateListHeader();
 });
 
@@ -85,7 +80,9 @@ function handleFormSubmit(e) {
     completed: false
   };
 
-  // Optimistic UX
+  // Optimistic UX Update via Store
+  store.optimisticAddTask(newTask);
+  
   showToast('Task created successfully!', 'success');
   form.reset();
   resetCategorySelect(categoryInput);
@@ -97,32 +94,19 @@ function handleFormSubmit(e) {
 }
 
 /* ======================================================
-   VALIDATION
-====================================================== */
-
-function validateTask({ title, dueDate }) {
-  const errors = [];
-
-  if (!title) errors.push('Title is required.');
-  else if (title.length < 3)
-    errors.push('Title must be at least 3 characters long.');
-
-  if (!dueDate) errors.push('Due date is required.');
-
-  return errors;
-}
-
-/* ======================================================
    RENDERING — TASK LIST
 ====================================================== */
 
-function renderTasks() {
+function renderTasks(tasksToRender) {
   if (!taskListUl) return;
+
+  // Use passed tasks or fetch from store
+  const tasks = tasksToRender || store.getTasks();
 
   taskListUl.innerHTML = '';
 
   const categoriesMap = loadCategoriesMap();
-  const visibleTasks = getFilteredTasks();
+  const visibleTasks = getFilteredTasks(tasks);
 
   const fragment = document.createDocumentFragment();
 
@@ -135,7 +119,7 @@ function renderTasks() {
   taskListUl.appendChild(fragment);
 }
 
-function getFilteredTasks() {
+function getFilteredTasks(tasks) {
   if (currentFilter === 'pending') {
     return tasks.filter(t => !t.completed);
   }
@@ -234,9 +218,10 @@ function updateListHeader() {
     currentFilter === 'all' ? 'All Tasks' : 'Pending Tasks';
 }
 
-function updateEmptyState() {
+function updateEmptyState(tasks) {
   if (!noTasksMessage) return;
-  noTasksMessage.classList.toggle('active', tasks.length === 0);
+  const currentTasks = tasks || store.getTasks();
+  noTasksMessage.classList.toggle('active', currentTasks.length === 0);
 }
 
 function resetCategorySelect(categoryInput) {

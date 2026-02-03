@@ -10,6 +10,8 @@ import { initTheme } from "./modules/theme.js"
 import { initReminders } from "./modules/reminderService.js"
 import { initSearch } from "./modules/search.js"
 
+
+
 initNavigation();
 initScheduleList();
 initReminders();

@@ -1,4 +1,6 @@
 import { dbService } from '../services/db.js';
+import { store } from '../store.js';
+import { getIcon } from '../utils/icons.js';
 
 /* ======================================================
    STATE
@@ -10,9 +12,6 @@ const state = {
   priority: 'all',   // all | low | medium | high | extreme
   category: 'all'
 };
-
-let tasks = [];
-let schedules = [];
 
 /* ======================================================
    DOM REFERENCES
@@ -27,8 +26,8 @@ const categoryFilterOptions = document.getElementById('filter-category-options')
 ====================================================== */
 
 const ICONS = {
-  task: `📋`,
-  schedule: `⏰`
+  task: getIcon(''),
+  schedule: getIcon('')
 };
 
 /* ======================================================
@@ -46,16 +45,13 @@ export function initSearch() {
 ====================================================== */
 
 function subscribeToData() {
-  dbService.onTasksSnapshot(data => {
-    tasks = data;
-    updateCategoryFilter();
-    performSearch();
+  store.addEventListener('tasksUpdated', () => {
+     performSearch();
+     updateCategoryFilter();
   });
-
-  dbService.onSchedulesSnapshot(data => {
-    schedules = data;
-    updateCategoryFilter();
-    performSearch();
+  store.addEventListener('schedulesUpdated', () => {
+     performSearch();
+     updateCategoryFilter();
   });
 }
 
@@ -110,7 +106,17 @@ function setupCustomSelect(id, onSelect) {
   trigger.addEventListener('click', e => {
     e.stopPropagation();
     closeAllDropdowns();
-    options.classList.toggle('show');
+    // Toggle hidden class logic
+    if (options.classList.contains('hidden')) {
+        options.classList.remove('hidden');
+        // Small delay to allow CSS transition to work if needed, 
+        // though with display:none->block transitions don't work well without animation frames.
+        // For now, just removing hidden is enough to show it.
+        requestAnimationFrame(() => options.classList.add('show'));
+    } else {
+        options.classList.remove('show');
+        options.classList.add('hidden');
+    }
     trigger.classList.toggle('active');
   });
 
@@ -126,7 +132,10 @@ function setupCustomSelect(id, onSelect) {
       .forEach(o => o.classList.remove('selected'));
 
     option.classList.add('selected');
+    
+    // Close dropdown
     options.classList.remove('show');
+    options.classList.add('hidden');
     trigger.classList.remove('active');
 
     onSelect(value);
@@ -136,7 +145,10 @@ function setupCustomSelect(id, onSelect) {
 function closeAllDropdowns() {
   document
     .querySelectorAll('.filter-select-options')
-    .forEach(el => el.classList.remove('show'));
+    .forEach(el => {
+        el.classList.remove('show');
+        el.classList.add('hidden');
+    });
 
   document
     .querySelectorAll('.filter-select-trigger')
@@ -161,8 +173,8 @@ function updateCategoryFilter() {
     categories.set(c.value, c.label || c.value)
   );
 
-  tasks.forEach(t => categories.set(t.category, t.category));
-  schedules.forEach(s => categories.set(s.category, s.category));
+  store.getTasks().forEach(t => categories.set(t.category, t.category));
+  store.getSchedules().forEach(s => categories.set(s.category, s.category));
 
   categoryFilterOptions.innerHTML =
     `<div class="filter-option selected" data-value="all">All Categories</div>`;
@@ -188,8 +200,8 @@ function performSearch() {
 
 function normalizeItems() {
   return [
-    ...tasks.map(t => normalizeItem(t, 'task')),
-    ...schedules.map(s => normalizeItem(s, 'schedule'))
+    ...store.getTasks().map(t => normalizeItem(t, 'task')),
+    ...store.getSchedules().map(s => normalizeItem(s, 'schedule'))
   ];
 }
 
@@ -270,7 +282,7 @@ function renderResults(items) {
 
     li.innerHTML = `
       <div class="task-header">
-        <div class="status-task">${ICONS[item.type]}</div>
+        <div class="status-task"></div>
         <span class="name-task">
           <span class="priority-dot ${item.priority}"></span>
           ${item.title}
