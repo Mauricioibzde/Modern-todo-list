@@ -439,15 +439,13 @@
         li {
             width: 100%;
            
-            max-width: 600px;
             min-width: 200px;
             margin: 0 auto 1rem auto;
             margin-top: 0.5rem;
-            border-radius: 0.5rem;
+        
             cursor: pointer;
             padding: 1rem;
             background-color: #ffebf9;
-            border-radius: 1rem;
         
            
             transition: all 0.3s ease;
@@ -578,7 +576,7 @@
     
         li {
             width: 100%;
-              box-shadow: 2px 0 0 0 var(--bd-li);
+          
             min-width: 200px;
             margin: 0 auto 1rem auto;
             margin-top: 0.5rem;

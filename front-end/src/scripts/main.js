@@ -32,4 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Full Page Calendar
     new Calendar({ containerSelector: '#full-page-calendar-container' });
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW registred', reg))
+            .catch(err => console.log('SW failed', err));
+    }
 });
