@@ -11,15 +11,104 @@ const scheduleListUl = document.querySelector('.list-schedules-ul');
 const noSchedulesMessage = document.querySelector('.no-schedules-message');
 
 /* ======================================================
+   STATE
+====================================================== */
+
+let filterState = {
+    status: 'pending',
+    search: '',
+    category: 'all'
+};
+
+/* ======================================================
    INIT
 ====================================================== */
 
 export function initScheduleList() {
   store.addEventListener('schedulesUpdated', (e) => {
     const schedules = e.detail;
+    populateCategoryFilter();
     renderSchedules(schedules);
     updateEmptyState(schedules);
   });
+  
+  initFilterListeners();
+  // Initial population could also happen here if store is ready, 
+  // but usually relies on customCategories which might be in localStorage.
+  populateCategoryFilter();
+}
+
+function initFilterListeners() {
+    const searchInput = document.querySelector('#schedule-search');
+    const statusSelect = document.querySelector('#schedule-filter-status');
+    const categorySelect = document.querySelector('#schedule-filter-category');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            filterState.search = e.target.value.toLowerCase();
+            renderSchedules();
+        });
+    }
+
+    if (statusSelect) {
+        statusSelect.addEventListener('change', (e) => {
+            filterState.status = e.target.value;
+            renderSchedules();
+            updateListHeader();
+        });
+    }
+
+    if (categorySelect) {
+        categorySelect.addEventListener('change', (e) => {
+            filterState.category = e.target.value;
+            renderSchedules();
+        });
+    }
+}
+
+function updateListHeader() {
+  const header = document.querySelector('#schedules-title');
+  if (!header) return;
+
+  const titles = {
+      'all': 'All Schedules',
+      'pending': 'Pending Schedules',
+      'completed': 'Completed Schedules'
+  };
+  
+  header.textContent = titles[filterState.status] || 'Schedules';
+}
+
+function populateCategoryFilter() {
+    const categorySelect = document.querySelector('#schedule-filter-category');
+    if (!categorySelect) return;
+
+    // Keep current selection
+    const currentVal = filterState.category;
+    
+    // Clear except first option
+    while(categorySelect.options.length > 1) {
+        categorySelect.remove(1);
+    }
+
+    const customCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
+    
+    customCategories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.value;
+        option.textContent = cat.label || cat.value;
+        categorySelect.appendChild(option);
+    });
+
+    // Restore value
+    if (currentVal !== 'all') {
+         const exists = [...categorySelect.options].some(o => o.value === currentVal);
+         if(exists) categorySelect.value = currentVal;
+         else {
+             categorySelect.value = 'all';
+             filterState.category = 'all';
+         }
+    }
 }
 
 /* ======================================================
@@ -29,7 +118,9 @@ export function initScheduleList() {
 function renderSchedules(schedules) {
   if (!scheduleListUl) return;
   // Fallback to store if not passed
-  const currentSchedules = schedules || store.getSchedules();
+  const allSchedules = schedules || store.getSchedules();
+  
+  const currentSchedules = getFilteredSchedules(allSchedules);
 
   scheduleListUl.innerHTML = '';
 
@@ -43,6 +134,26 @@ function renderSchedules(schedules) {
   });
 
   scheduleListUl.appendChild(fragment);
+}
+
+function getFilteredSchedules(schedules) {
+  return schedules.filter(s => {
+      // 1. Status Filter
+      if (filterState.status === 'pending' && s.completed) return false;
+      if (filterState.status === 'completed' && !s.completed) return false;
+
+      // 2. Category Filter
+      if (filterState.category !== 'all' && s.category !== filterState.category) return false;
+
+      // 3. Search Filter
+      if (filterState.search) {
+          const matchTitle = s.title.toLowerCase().includes(filterState.search);
+          const matchDesc = s.description?.toLowerCase().includes(filterState.search);
+          if (!matchTitle && !matchDesc) return false;
+      }
+
+      return true;
+  });
 }
 
 /* ======================================================

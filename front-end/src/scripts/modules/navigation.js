@@ -13,7 +13,6 @@ export function initNavigation() {
     'nav-dashboard': '.dashboard',
     'nav-list-tasks': '.list-tasks',
     'nav-all-tasks': '.list-tasks',
-    'nav-search': '.search',
     'nav-insights': '.dashboard',
     'nav-calendar': '.calendar-view',
     'nav-create-schedule': '.create-schedule',
@@ -138,7 +137,7 @@ export function initNavigation() {
   ====================================================== */
   const urlParams = new URLSearchParams(window.location.search);
   const pageParam = urlParams.get('page');
-  const savedRoute = pageParam || localStorage.getItem('currentView') || 'nav-dashboard';
+  const savedRoute = pageParam || localStorage.getItem('currentView') || 'nav-list-tasks';
 
   // Replace current history entry so we have state
   const url = new URL(window.location);

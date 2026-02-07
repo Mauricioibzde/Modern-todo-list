@@ -89,16 +89,6 @@
                     </span> New schedule
                 </a>
            
-                <a href="#" class="item" id="nav-search">
-                    <span>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                        </svg>
-
-                    </span> Search
-                </a>
                 <a href="#" class="item" id="nav-insights">
                     <span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                             stroke="currentColor" className="size-6">
@@ -232,74 +222,7 @@
             </div>
         </section>
 
-        <section class="search hidden">
-            <div class="search-header">
-                <h1>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-</svg>
-
-                    
-                    Search & Filter</h1>
-            </div>
-            
-            <div class="search-wrapper">
-                <div class="search-bar">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="search-icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                    </svg>
-                    <input type="text" id="search-input" placeholder="Search tasks or schedules..." />
-                </div>
-                
-                <div class="search-advanced-filters">
-                    <!-- Type Filter -->
-                    <div class="custom-filter-select" id="filter-type">
-                         <div class="filter-select-trigger">
-                            <span>Type: All</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
-                         </div>
-                         <div class="filter-select-options hidden">
-                             <div class="filter-option" data-value="all">All Types</div>
-                             <div class="filter-option" data-value="task">Tasks</div>
-                             <div class="filter-option" data-value="schedule">Schedules</div>
-                         </div>
-                    </div>
-
-                    <!-- Priority Filter -->
-                    <div class="custom-filter-select" id="filter-priority">
-                         <div class="filter-select-trigger">
-                            <span>Priority: All</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
-                         </div>
-                         <div class="filter-select-options hidden">
-                             <div class="filter-option" data-value="all">All Priorities</div>
-                             <div class="filter-option" data-value="low">Low</div>
-                             <div class="filter-option" data-value="medium">Medium</div>
-                             <div class="filter-option" data-value="high">High</div>
-                             <div class="filter-option" data-value="extreme">Extreme</div>
-                         </div>
-                    </div>
-
-                    <!-- Category Filter -->
-                    <div class="custom-filter-select" id="filter-category">
-                         <div class="filter-select-trigger">
-                            <span>Category: All</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
-                         </div>
-                         <div class="filter-select-options hidden" id="filter-category-options">
-                             <div class="filter-option" data-value="all">All Categories</div>
-                             <!-- Dynamically populated -->
-                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="search-results tasks-container">
-                <ul class="search-results-ul list-tasks-ul">
-                    <!-- Search results will appear here -->
-                </ul>
-            </div>
-        </section>
+<!-- Removed Search Section -->
 
         <section class="calendar-view hidden">
             <div class="calendar-view-header">
@@ -393,10 +316,27 @@
 
         </section>
         <section class="list-tasks">
-            <h1>
-               
-                All Tasks 
-            </h1>
+            <div class="tasks-header-wrapper">
+                <h1 id="tasks-title">Pending Tasks</h1>
+                <div class="filter-toolbar">
+                    <div class="search-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                        <input type="text" id="task-search" placeholder="Search tasks...">
+                    </div>
+                    <div class="filter-actions">
+                         <select id="task-filter-status" class="modern-select">
+                            <option value="pending" selected>Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="all">All</option>
+                        </select>
+                        <select id="task-filter-category" class="modern-select">
+                            <option value="all">All Categories</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
             <div class="tasks-container">
                 <div class="no-tasks-message">
                     <p>You haven't added any tasks yet. Please add a new task.</p>
@@ -408,7 +348,27 @@
         </section>
 
         <section class="list-schedules hidden">
-            <h1>All Schedules</h1>
+            <div class="tasks-header-wrapper">
+                <h1 id="schedules-title">Pending Schedules</h1>
+                <div class="filter-toolbar">
+                    <div class="search-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                        <input type="text" id="schedule-search" placeholder="Search schedules...">
+                    </div>
+                    <div class="filter-actions">
+                         <select id="schedule-filter-status" class="modern-select">
+                            <option value="pending" selected>Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="all">All</option>
+                        </select>
+                        <select id="schedule-filter-category" class="modern-select">
+                            <option value="all">All Categories</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
             <div class="schedules-container">
                 <div class="no-schedules-message">
                     <p>You haven't added any schedules yet. Please add a new schedule.</p>

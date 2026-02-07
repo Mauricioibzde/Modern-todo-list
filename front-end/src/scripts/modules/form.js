@@ -20,7 +20,11 @@ const noTasksMessage = document.querySelector('.no-tasks-message');
    STATE
 ====================================================== */
 
-let currentFilter = 'pending'; // 'pending' | 'all'
+let filterState = {
+    status: 'pending',
+    search: '',
+    category: 'all'
+};
 
 /* ======================================================
    INIT — REALTIME SYNC (VIA STORE)
@@ -28,6 +32,7 @@ let currentFilter = 'pending'; // 'pending' | 'all'
 
 store.addEventListener('tasksUpdated', (e) => {
     const tasks = e.detail;
+    populateCategoryFilter(); // Ensure categories are up to date
     renderTasks(tasks); 
     updateEmptyState(tasks);
     updateDashboard(tasks);
@@ -37,11 +42,92 @@ store.addEventListener('tasksUpdated', (e) => {
    FILTER EVENTS
 ====================================================== */
 
+// Global event for routing side-effects
 document.addEventListener('filterTasks', e => {
-  currentFilter = e.detail.filter;
+  filterState.status = e.detail.filter;
+  const statusSelect = document.querySelector('#task-filter-status');
+  if(statusSelect) statusSelect.value = filterState.status;
+  
   renderTasks(store.getTasks());
   updateListHeader();
 });
+
+// Local Filter UI Events
+function initFilterListeners() {
+    const searchInput = document.querySelector('#task-search');
+    const statusSelect = document.querySelector('#task-filter-status');
+    const categorySelect = document.querySelector('#task-filter-category');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            filterState.search = e.target.value.toLowerCase();
+            renderTasks();
+        });
+    }
+
+    if (statusSelect) {
+        statusSelect.addEventListener('change', (e) => {
+            filterState.status = e.target.value;
+            renderTasks();
+            updateListHeader();
+        });
+    }
+
+    if (categorySelect) {
+        categorySelect.addEventListener('change', (e) => {
+            filterState.category = e.target.value;
+            renderTasks();
+        });
+    }
+}
+
+// Call on load
+function init() {
+    populateCategoryFilter();
+    initFilterListeners();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
+function populateCategoryFilter() {
+    const categorySelect = document.querySelector('#task-filter-category');
+    if (!categorySelect) return;
+
+    // Keep current selection if possible
+    const currentVal = categorySelect.value;
+    
+    // Clear except first option
+    while(categorySelect.options.length > 1) {
+        categorySelect.remove(1);
+    }
+
+    const customCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
+    
+    // Default categories if needed, or just custom ones
+    // Assuming customCategories contains all available categories
+    
+    customCategories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.value;
+        option.textContent = cat.label || cat.value; 
+        categorySelect.appendChild(option);
+    });
+
+    // Restore value if it still exists
+    if(filterState.category !== 'all') {
+         // Check if option exists
+         const exists = [...categorySelect.options].some(o => o.value === filterState.category);
+         if(exists) categorySelect.value = filterState.category;
+         else {
+             categorySelect.value = 'all'; 
+             filterState.category = 'all';
+         }
+    }
+}
 
 /* ======================================================
    FORM SUBMISSION
@@ -120,10 +206,23 @@ function renderTasks(tasksToRender) {
 }
 
 function getFilteredTasks(tasks) {
-  if (currentFilter === 'pending') {
-    return tasks.filter(t => !t.completed);
-  }
-  return tasks;
+  return tasks.filter(t => {
+      // 1. Status Filter
+      if (filterState.status === 'pending' && t.completed) return false;
+      if (filterState.status === 'completed' && !t.completed) return false;
+
+      // 2. Category Filter
+      if (filterState.category !== 'all' && t.category !== filterState.category) return false;
+
+      // 3. Search Filter
+      if (filterState.search) {
+          const matchTitle = t.title.toLowerCase().includes(filterState.search);
+          const matchDesc = t.description?.toLowerCase().includes(filterState.search);
+          if (!matchTitle && !matchDesc) return false;
+      }
+
+      return true;
+  });
 }
 
 /* ======================================================
@@ -222,11 +321,16 @@ function attachTaskEvents(li, task) {
 ====================================================== */
 
 function updateListHeader() {
-  const header = document.querySelector('.list-tasks h1');
+  const header = document.querySelector('#tasks-title');
   if (!header) return;
 
-  header.textContent =
-    currentFilter === 'all' ? 'All Tasks' : 'Pending Tasks';
+  const titles = {
+      'all': 'All Tasks',
+      'pending': 'Pending Tasks',
+      'completed': 'Completed Tasks'
+  };
+  
+  header.textContent = titles[filterState.status] || 'Tasks';
 }
 
 function updateEmptyState(tasks) {
