@@ -23,7 +23,8 @@ const noTasksMessage = document.querySelector('.no-tasks-message');
 let filterState = {
     status: 'pending',
     search: '',
-    category: 'all'
+    category: 'all',
+    priority: 'all'
 };
 
 /* ======================================================
@@ -57,6 +58,7 @@ function initFilterListeners() {
     const searchInput = document.querySelector('#task-search');
     const statusSelect = document.querySelector('#task-filter-status');
     const categorySelect = document.querySelector('#task-filter-category');
+    const prioritySelect = document.querySelector('#task-filter-priority');
 
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -70,6 +72,13 @@ function initFilterListeners() {
             filterState.status = e.target.value;
             renderTasks();
             updateListHeader();
+        });
+    }
+
+    if (prioritySelect) {
+        prioritySelect.addEventListener('change', (e) => {
+            filterState.priority = e.target.value;
+            renderTasks();
         });
     }
 
@@ -192,7 +201,7 @@ function renderTasks(tasksToRender) {
   taskListUl.innerHTML = '';
 
   const categoriesMap = loadCategoriesMap();
-  const visibleTasks = getFilteredTasks(tasks);
+  const visibleTasks = getFilteredTasks(tasks, categoriesMap);
 
   const fragment = document.createDocumentFragment();
 
@@ -205,7 +214,7 @@ function renderTasks(tasksToRender) {
   taskListUl.appendChild(fragment);
 }
 
-function getFilteredTasks(tasks) {
+function getFilteredTasks(tasks, categoriesMap) {
   return tasks.filter(t => {
       // 1. Status Filter
       if (filterState.status === 'pending' && t.completed) return false;
@@ -214,7 +223,16 @@ function getFilteredTasks(tasks) {
       // 2. Category Filter
       if (filterState.category !== 'all' && t.category !== filterState.category) return false;
 
-      // 3. Search Filter
+      // 3. Priority Filter (Requires Category Look-up)
+      if (filterState.priority !== 'all') {
+          // If a category map wasn't passed, we can't filter reliably, but usually it is passed.
+          // Note: If t.category isn't in map (deleted?) treat as no priority.
+          const cat = categoriesMap?.get(t.category);
+          const taskPriority = cat?.priority || 'none'; 
+          if (taskPriority !== filterState.priority) return false;
+      }
+
+      // 4. Search Filter
       if (filterState.search) {
           const matchTitle = t.title.toLowerCase().includes(filterState.search);
           const matchDesc = t.description?.toLowerCase().includes(filterState.search);

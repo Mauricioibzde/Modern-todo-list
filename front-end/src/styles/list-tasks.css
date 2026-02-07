@@ -20,6 +20,13 @@
     gap: 1.5rem;
 }
 
+@media (max-width: 768px) {
+    .tasks-header-wrapper {
+        padding: 1rem; /* Compact padding for mobile */
+        gap: 1rem;
+    }
+}
+
 @media (min-width: 768px) {
     .tasks-header-wrapper {
         flex-direction: row;
@@ -37,6 +44,12 @@
     white-space: nowrap;
 }
 
+@media (max-width: 768px) {
+    .tasks-header-wrapper h1 {
+        font-size: 1.25rem; /* Smaller title on mobile */
+    }
+}
+
 .filter-toolbar {
     display: flex;
     flex-direction: column;
@@ -45,7 +58,7 @@
     max-width: 800px;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
     .filter-toolbar {
         flex-direction: row;
         align-items: center;
@@ -94,6 +107,23 @@
     gap: 0.75rem;
 }
 
+/* Mobile: Horizontal Scroll for filters */
+@media (max-width: 767px) {
+    .filter-actions {
+        overflow-x: auto;
+        padding-bottom: 0.25rem; /* Space for scrollbar if visible */
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        /* Hide scrollbar for cleaner look */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+    
+    .filter-actions::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+}
+
 .modern-select {
     padding: 0.6rem 2rem 0.6rem 1rem;
     border-radius: 0.75rem;
@@ -109,6 +139,9 @@
     background-size: 1rem;
     transition: all 0.2s ease;
     min-width: 120px;
+    
+    /* Ensure selects don't shrink on mobile scroll view */
+    flex-shrink: 0; 
 }
 
 .modern-select:focus {

@@ -17,7 +17,8 @@ const noSchedulesMessage = document.querySelector('.no-schedules-message');
 let filterState = {
     status: 'pending',
     search: '',
-    category: 'all'
+    category: 'all',
+    priority: 'all'
 };
 
 /* ======================================================
@@ -42,6 +43,7 @@ function initFilterListeners() {
     const searchInput = document.querySelector('#schedule-search');
     const statusSelect = document.querySelector('#schedule-filter-status');
     const categorySelect = document.querySelector('#schedule-filter-category');
+    const prioritySelect = document.querySelector('#schedule-filter-priority');
 
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
@@ -55,6 +57,13 @@ function initFilterListeners() {
             filterState.status = e.target.value;
             renderSchedules();
             updateListHeader();
+        });
+    }
+
+    if (prioritySelect) {
+        prioritySelect.addEventListener('change', (e) => {
+            filterState.priority = e.target.value;
+            renderSchedules();
         });
     }
 
@@ -119,12 +128,12 @@ function renderSchedules(schedules) {
   if (!scheduleListUl) return;
   // Fallback to store if not passed
   const allSchedules = schedules || store.getSchedules();
-  
-  const currentSchedules = getFilteredSchedules(allSchedules);
+
+  const categoriesMap = loadScheduleCategories();
+  const currentSchedules = getFilteredSchedules(allSchedules, categoriesMap);
 
   scheduleListUl.innerHTML = '';
 
-  const categoriesMap = loadScheduleCategories();
   const fragment = document.createDocumentFragment();
 
   currentSchedules.forEach(schedule => {
@@ -136,7 +145,7 @@ function renderSchedules(schedules) {
   scheduleListUl.appendChild(fragment);
 }
 
-function getFilteredSchedules(schedules) {
+function getFilteredSchedules(schedules, categoriesMap) {
   return schedules.filter(s => {
       // 1. Status Filter
       if (filterState.status === 'pending' && s.completed) return false;
@@ -145,7 +154,14 @@ function getFilteredSchedules(schedules) {
       // 2. Category Filter
       if (filterState.category !== 'all' && s.category !== filterState.category) return false;
 
-      // 3. Search Filter
+      // 3. Priority Filter
+      if (filterState.priority !== 'all') {
+          const cat = categoriesMap?.get(s.category);
+          const priority = cat?.priority || 'none';
+          if (priority !== filterState.priority) return false;
+      }
+
+      // 4. Search Filter
       if (filterState.search) {
           const matchTitle = s.title.toLowerCase().includes(filterState.search);
           const matchDesc = s.description?.toLowerCase().includes(filterState.search);
