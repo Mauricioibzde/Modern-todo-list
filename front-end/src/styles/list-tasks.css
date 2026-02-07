@@ -124,17 +124,26 @@
                 .delete-button {
                   
                     border: none;
-                    color: #ffffff; /* Fixed white text for contrast on colored background */
+                    color: #ffffff;
                     cursor: pointer;
                     border-radius: 4px;
                     font-size: 1rem;
-                    padding: 0rem 1rem; /* Added padding for better click area */
+                    padding: 0.5rem 1rem; /* Increase padding */
                     transition: transform 0.2s ease;
 
                     &:hover {
                         transform: scale(1.05);
                     }
                 }
+                
+                .edit-button {
+                    background-color: var(--color-primary, #6366f1);
+                }
+                
+                .delete-button {
+                    background-color: var(--color-danger, #ef4444);
+                }
+
 
            
             }

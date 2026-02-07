@@ -27,26 +27,7 @@ body {
     min-height: 100vh;
 }
 
-/* 
-   --- Transparency for Containers ---
-   Make structure containers transparent so the body background shows through.
-   Applies to BOTH Light and Dark modes now.
-*/
-main,
-section,
-.dashboard,
-.list-tasks,
-.create-task,
-.list-schedules,
-.create-schedule,
-.search,
-.calendar-view {
-    background: transparent !important;
-    background-color: transparent !important;
-    background-image: none !important;
-    box-shadow: none !important;
-    border: none !important;
-}
+
 
 /* --- Opaque Elements --- */
 /* Keep opacity for nested cards/inputs so they remain readable */

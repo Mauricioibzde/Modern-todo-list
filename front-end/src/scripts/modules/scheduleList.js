@@ -1,5 +1,5 @@
 import { showToast } from './alerts.js';
-import { showConfirmModal } from './modals.js';
+import { showConfirmModal, showEditScheduleModal } from './modals.js';
 import { dbService } from '../services/db.js';
 import { store } from '../store.js';
 
@@ -87,6 +87,7 @@ function createScheduleElement(schedule, categoriesMap) {
     </div>
 
     <div class="controls">
+      <button class="edit-button">Edit</button>
       <button class="delete-button">Delete</button>
     </div>
   `;
@@ -116,6 +117,16 @@ function attachScheduleEvents(li, schedule) {
 
     dbService.updateSchedule(schedule.id, {
       completed: e.target.checked
+    });
+  });
+
+  // Edit
+  li.querySelector('.edit-button').addEventListener('click', e => {
+    e.stopPropagation();
+
+    showEditScheduleModal(schedule, (updatedSchedule) => {
+        dbService.updateSchedule(schedule.id, updatedSchedule);
+        showToast('Schedule updated successfully', 'success');
     });
   });
 

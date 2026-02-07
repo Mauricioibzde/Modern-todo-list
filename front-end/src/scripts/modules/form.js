@@ -1,6 +1,6 @@
 import { updateDashboard } from './dashboard.js';
 import { showToast } from './alerts.js';
-import { showConfirmModal } from './modals.js';
+import { showConfirmModal, showEditTaskModal } from './modals.js';
 import { dbService } from '../services/db.js';
 import { validateTask } from '../utils/validators.js';
 import { store } from '../store.js';
@@ -157,6 +157,7 @@ function createTaskElement(task, categoriesMap) {
     </div>
 
     <div class="controls">
+      <button class="edit-button">Edit</button>
       <button class="delete-button">Delete</button>
     </div>
   `;
@@ -187,6 +188,16 @@ function attachTaskEvents(li, task) {
     dbService.updateTask(task.id, {
       completed: e.target.checked,
       completedAt: e.target.checked ? new Date().toISOString() : null
+    });
+  });
+
+  // Edit
+  li.querySelector('.edit-button').addEventListener('click', e => {
+    e.stopPropagation();
+
+    showEditTaskModal(task, (updatedTask) => {
+        dbService.updateTask(task.id, updatedTask);
+        showToast('Task updated successfully', 'success');
     });
   });
 
